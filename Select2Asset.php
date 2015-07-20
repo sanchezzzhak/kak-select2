@@ -11,15 +11,15 @@ class Select2Asset extends AssetBundle
 
     public function init()
     {
-        $this->js[] = 'js/select2' . (YII_DEBUG ? ".min" : "")  . ".js";
-        $this->css[] = 'js/select2' . (YII_DEBUG ? ".min" : "") . ".css";
+        $this->js[] = 'js/select2' . (!YII_DEBUG ? ".min" : "")  . ".js";
+        $this->css[] = 'css/select2' . (!YII_DEBUG ? ".min" : "") . ".css";
     }
 
 
     public function addLanguage($lang)
     {
         $lang =!empty($lang) ? $lang : 'en';
-        $this->js[] = 'js/i18n'.$lang .'.js';
+        $this->js[] = 'js/i18n/'.$lang .'.js';
         return $this;
     }
 
