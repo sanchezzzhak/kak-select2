@@ -24,7 +24,6 @@ class Select2 extends \yii\widgets\InputWidget
 
     public function init()
     {
-        $this->init();
         $this->initDefaultOption();
 
         // render input
