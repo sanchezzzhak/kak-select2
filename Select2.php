@@ -15,6 +15,7 @@ class Select2 extends \yii\widgets\InputWidget
      * @var array the HTML attributes for the widget container tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
+    public $language;
     public $options = [];
     public $items = [];
 
@@ -31,8 +32,11 @@ class Select2 extends \yii\widgets\InputWidget
             ? Html::activeDropDownList($this->model, $this->attribute, $this->items , $this->options)
             : Html::dropDownList($this->name, $this->value, $this->items, $this->options);
 
+        // asset attach
         $view = $this->getView();
+        Select2Asset::register($view)->addLanguage($this->language);
     }
+
 
     protected function initDefaultOption()
     {

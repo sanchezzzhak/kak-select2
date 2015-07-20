@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-4": {
-            "kak\\widgets\\area\\": ""
+            "kak\\widgets\\select2\\": ""
         }
     }
 }
