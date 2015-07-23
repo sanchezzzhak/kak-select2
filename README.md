@@ -2,6 +2,10 @@ Select2 widgets
 ================
 Select2 widgets for Yii2
 
+Preview
+------------
+<img src="https://lh3.googleusercontent.com/-SYtyKxfvZz4/VbCwEPzvxEI/AAAAAAAAAC4/Or5c1ObK7EM/s339-Ic42/select2Preview.png">
+
 Installation
 ------------
 
