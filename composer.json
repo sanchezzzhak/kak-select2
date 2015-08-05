@@ -13,7 +13,7 @@
     "require": {
         "yiisoft/yii2": "*",
         "bower-asset/select2": "4.0.0",
-        "bower-asset/select2-bootstrap-theme": "dev-master"
+        "bower-asset/select2-bootstrap-theme": "0.1.0-beta.4"
 
     },
     "extra": {
