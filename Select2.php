@@ -93,7 +93,7 @@ class Select2 extends \yii\widgets\InputWidget
 
         if (isset($this->placeholder))
             $this->options['data-placeholder'] = $this->placeholder;
-        
+
         $this->clientOptions['theme']    = $this->theme;
 
         Html::addCssStyle($this->options,['width'=>'100%'],false);
