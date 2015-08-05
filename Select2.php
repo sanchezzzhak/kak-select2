@@ -29,7 +29,7 @@ class Select2 extends \yii\widgets\InputWidget
     public $items = [];
 
     public $multiple = false;
-    public $theme = self::THEME_BOOTSTRAP;
+    public $theme    = self::THEME_BOOTSTRAP;
 
     public function init()
     {
@@ -44,11 +44,16 @@ class Select2 extends \yii\widgets\InputWidget
         $view = $this->getView();
         Select2Asset::register($view)->addLanguage($this->language);
         Select2AssetLib::register($view);
-    }
 
+        if($this->theme == self::THEME_BOOTSTRAP) {
+            ThemeBootstrap::register($view);
+        }
+
+    }
 
     protected function initDefaultOption()
     {
+        $this->options['theme'] = $this->theme;
         $this->options = ArrayHelper::merge($this->defaultOptions, $this->options);
         if (!isset($this->options['id'])) {
             $this->options['id'] = $this->getId();
