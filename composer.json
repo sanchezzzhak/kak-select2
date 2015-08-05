@@ -12,8 +12,8 @@
     ],
     "require": {
         "yiisoft/yii2": "*",
-        "bower-asset/select2": "3.*"
-
+        "bower-asset/select2": "4.0.0",
+        "bower-asset/select2-bootstrap-theme": "*"
     },
     "extra": {
         "asset-installer-paths": {
