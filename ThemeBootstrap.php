@@ -4,7 +4,7 @@ use yii\web\AssetBundle;
 
 class ThemeBootstrap extends AssetBundle
 {
-    public $sourcePath = '@bower/select2-bootstrap-theme/dist';
+    public $sourcePath = '@bower/select2';
 
     public function init()
     {
