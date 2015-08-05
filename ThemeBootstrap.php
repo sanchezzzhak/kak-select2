@@ -4,10 +4,10 @@ use yii\web\AssetBundle;
 
 class ThemeBootstrap extends AssetBundle
 {
-    public $sourcePath = '@bower/select2';
+    public $sourcePath = '@vendor/kak/select2/assets';
 
     public function init()
     {
-        $this->css[] = 'css/select2-bootstrap' . (!YII_DEBUG ? ".min" : "") . ".css";
+        $this->css[] = 'select2-bootstrap-theme' . (!YII_DEBUG ? ".min" : "") . ".css";
     }
 }
