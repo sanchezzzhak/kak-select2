@@ -21,9 +21,13 @@ class Select2 extends \yii\widgets\InputWidget
     /** @var array */
     public $options = [];
     /** @var array */
-    public $defaultOptions = [
+
+    private $defaultClientOptions = [
         'placeholder' => ''
     ];
+
+    public $clientOptions = [];
+
 
     /** @var array */
     public $items = [];
@@ -43,21 +47,21 @@ class Select2 extends \yii\widgets\InputWidget
         // asset attach
         $view = $this->getView();
         Select2Asset::register($view)->addLanguage($this->language);
-        Select2AssetLib::register($view);
-
         if($this->theme == self::THEME_BOOTSTRAP) {
             ThemeBootstrap::register($view);
         }
+        $view->registerJs("$('#{$this->options['id']}').select2({$this->clientOptions})");
 
     }
 
     protected function initDefaultOption()
     {
-        $this->options['theme'] = $this->theme;
-        $this->options = ArrayHelper::merge($this->defaultOptions, $this->options);
         if (!isset($this->options['id'])) {
             $this->options['id'] = $this->getId();
         }
+
+        $this->clientOptions['theme'] = $this->theme;
+        $this->clientOptions = ArrayHelper::merge($this->defaultClientOptions, $this->clientOptions);
 
         Html::addCssStyle($this->options,['width'=>'100%'],false);
         Html::addCssClass($this->options,'select2 form-control');
