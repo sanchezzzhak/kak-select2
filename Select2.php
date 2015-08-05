@@ -29,10 +29,13 @@ class Select2 extends \yii\widgets\InputWidget
     public $theme         = self::THEME_BOOTSTRAP;
     public $placeholder;
 
+    /** @var bool The first element empty */
+    public $firstItemEmpty = false;
+
     public $clientOptions = [];
     /** @var array */
     public $items = [];
-
+    public $data;
 
     public function init()
     {
@@ -42,6 +45,10 @@ class Select2 extends \yii\widgets\InputWidget
 
     public function run()
     {
+
+        if($this->firstItemEmpty) {
+            $this->items = [''=>''] + $this->items;
+        }
         // render input
         echo $this->hasModel()
             ? Html::activeDropDownList($this->model, $this->attribute, $this->items , $this->options)
