@@ -68,7 +68,8 @@ class Select2 extends \yii\widgets\InputWidget
             ThemeBootstrap::register($view);
         }
         $id = $this->options['id'];
-        $clientOptions = Json::encode($this->clientOptions);
+
+        $clientOptions = Json::htmlEncode($this->clientOptions);
 
         $view->registerJs("jQuery('#{$id}').select2({$clientOptions})");
     }
