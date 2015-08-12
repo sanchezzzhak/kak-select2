@@ -7,9 +7,13 @@ use yii\helpers\Html;
 use yii\base\InvalidConfigException;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\web\JsExpression;
 
 class Select2 extends \yii\widgets\InputWidget
 {
+    const JS_KEY = 'kak/select2/';
+
+
     const THEME_DEFAULT   = 'classic';
     const THEME_BOOTSTRAP = 'bootstrap';
 
@@ -29,13 +33,14 @@ class Select2 extends \yii\widgets\InputWidget
     public $theme         = self::THEME_BOOTSTRAP;
     public $placeholder;
 
+    public $events = [];
+
     /** @var bool The first element empty */
     public $firstItemEmpty = false;
 
     public $clientOptions = [];
     /** @var array */
     public $items = [];
-    public $data;
 
     public function init()
     {
@@ -68,13 +73,46 @@ class Select2 extends \yii\widgets\InputWidget
             ThemeBootstrap::register($view);
         }
         $id = $this->options['id'];
-
         $clientOptions = Json::htmlEncode($this->clientOptions);
 
-        $view->registerJs("jQuery('#{$id}').select2({$clientOptions})");
+        $view->registerJs("jQuery('#{$id}').select2({$clientOptions});" , $view::POS_READY, self::JS_KEY . $this->options['id'] );
+        $this->registerEvents();
     }
 
+    /**
+     * Register plugin' events.
+     */
+    protected function registerEvents()
+    {
+        $view = $this->getView();
+        $selector = '#' . $this->options['id'];
+        if (!empty($this->events)) {
+            $js = [];
+            foreach ($this->events as $event => $callback) {
+                if (is_array($callback)) {
+                    foreach ($callback as $function) {
+                        if (!$function instanceof JsExpression) {
+                            $function = new JsExpression($function);
+                        }
+                        $js[] = "jQuery('$selector').on('$event', $function);";
+                    }
+                } else {
+                    if (!$callback instanceof JsExpression) {
+                        $callback = new JsExpression($callback);
+                    }
+                    $js[] = "jQuery('$selector').on('$event', $callback);";
+                }
+            }
+            if (!empty($js)) {
+                $js = implode("\n", $js);
+                $view->registerJs($js, $view::POS_READY, self::JS_KEY .'events/'. $this->options['id']);
+            }
+        }
+    }
 
+    /**
+      Init config set options
+     */
     protected function initOption()
     {
         if (!isset($this->options['id'])) {
@@ -106,8 +144,6 @@ class Select2 extends \yii\widgets\InputWidget
 
         Html::addCssStyle($this->options,['width'=>'100%'],false);
         Html::addCssClass($this->options,'select2 form-control');
-
-
     }
 
 }
