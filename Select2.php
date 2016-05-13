@@ -17,6 +17,24 @@ class Select2 extends \yii\widgets\InputWidget
     const THEME_DEFAULT   = 'classic';
     const THEME_BOOTSTRAP = 'bootstrap';
 
+    //  Triggered whenever an option is selected or removed.
+    const EVENT_CHANGE = 'change';
+    //  Triggered whenever the dropdown is closed.
+    const EVENT_CLOSE = 'select2:close';
+    // Triggered before the dropdown is closed. This event can be prevented.
+    const EVENT_CLOSING = 'select2:closing';
+    //  Triggered whenever the dropdown is opened.
+    const EVENT_OPEN = 'select2:open';
+    //  Triggered before the dropdown is opened. This event can be prevented.
+    const EVENT_OPENING = 'select2:opening';
+    //  Triggered before a result is selected. This event can be prevented.
+    const EVENT_SELECT = 'select2:select';
+    //  Triggered whenever a result is selected.
+    const EVENT_SELECTING = 'select2:selecting';
+    //  Triggered whenever a selection is removed.
+    const EVENT_UNSELECT = 'select2:unselect';
+    //  Triggered before a selection is removed. This event can be prevented.
+    const EVENT_UNSELECTING = 'select2:unselecting';
 
     /**
      * @var array the HTML attributes for the widget container tag.
@@ -28,7 +46,11 @@ class Select2 extends \yii\widgets\InputWidget
     public $options = [];
     /** @var array */
     public $ajax;
+    public $ajaxCache = true;
+    public $minimumInputLength = 0;
+
     public $tags;
+
     public $multiple      = false;
     public $theme         = self::THEME_BOOTSTRAP;
     public $placeholder;
@@ -134,7 +156,9 @@ class Select2 extends \yii\widgets\InputWidget
 
         if (isset($this->ajax)) {
             $this->options['data-ajax--url'] = Url::to($this->ajax);
-            $this->options['data-ajax--cache'] = 'true';
+
+            $this->options['data-ajax--cache'] = $this->ajaxCache  ? 'true' : 'false';
+            $this->options['data-minimum-input-length'] = $this->minimumInputLength;
         }
 
         if (isset($this->placeholder))
