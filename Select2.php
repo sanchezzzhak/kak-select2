@@ -63,7 +63,7 @@ class Select2 extends \yii\widgets\InputWidget
     public $items = [];
 
     public $firstItemEmpty = true;
-    
+
     public $selectLabel = 'Select all';
     public $unselectLabel = 'Unselect all';
     public $toggleEnable  = true;
@@ -113,7 +113,7 @@ class Select2 extends \yii\widgets\InputWidget
      */
     protected function renderToggleAll()
     {
-        if(!$this->options['multiple'] || !$this->toggleEnable){
+        if(!$this->multiple || !$this->toggleEnable){
             return;
         }
         $settings = array_merge_recursive([
