@@ -41,7 +41,7 @@
                 url:url,
                 dataType:'json',
                 success: $.proxy( function(data){
-                    this.options['data'] = $.merge([{id:'',text:''}],data.results);
+                    this.options['data'] = data.results;
                     deferred.resolve('afterLoadData success');
                 },this)
             });

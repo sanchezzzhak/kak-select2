@@ -62,7 +62,7 @@ class Select2 extends \yii\widgets\InputWidget
     /** @var array */
     public $items = [];
 
-    public $firstItemEmpty = true;
+    public $firstItemEmpty = false;
 
     public $selectLabel = 'Select all';
     public $unselectLabel = 'Unselect all';
@@ -91,12 +91,10 @@ class Select2 extends \yii\widgets\InputWidget
 
     protected function renderInput()
     {
-
-        $id = $this->options['id'];
-
-        if($this->firstItemEmpty){
-            $this->items = ['' => $this->placeholder ] +  $this->items;
-        }
+        
+        //if($this->firstItemEmpty){
+        //    $this->items = ['' => $this->placeholder ] +  $this->items;
+        //}
 
         // render input
         $input = $this->hasModel()
@@ -213,7 +211,7 @@ class Select2 extends \yii\widgets\InputWidget
         }
 
         if ($this->toggleEnable)
-            $this->options['data-toggle-enable'] = $this->boolToStr($this->language);
+            $this->options['data-toggle-enable'] = $this->boolToStr($this->toggleEnable);
 
         if ($this->language)
             $this->options['data-language'] = $this->language;
