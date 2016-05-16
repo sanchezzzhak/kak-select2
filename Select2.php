@@ -45,24 +45,29 @@ class Select2 extends \yii\widgets\InputWidget
     /** @var array */
     public $options = [];
     /** @var array */
+
+    public $loadItemsUrl;
     public $ajax;
     public $ajaxCache = true;
     public $minimumInputLength = 0;
 
     public $tags;
-
     public $multiple      = false;
     public $theme         = self::THEME_BOOTSTRAP;
     public $placeholder;
 
     public $events = [];
 
-    /** @var bool The first element empty */
-    public $firstItemEmpty = false;
-
     public $clientOptions = [];
     /** @var array */
     public $items = [];
+
+    public $firstItemEmpty = true;
+    
+    public $selectLabel = 'Select all';
+    public $unselectLabel = 'Unselect all';
+    public $toggleEnable  = true;
+    public $toggleOptions = [];
 
     public function init()
     {
@@ -72,17 +77,66 @@ class Select2 extends \yii\widgets\InputWidget
 
     public function run()
     {
+        parent::run();
+        $this->renderWidget();
+    }
 
-        if($this->firstItemEmpty) {
-            $this->items = [''=>''] + $this->items;
+
+    protected function renderWidget()
+    {
+        $this->renderInput();
+        $this->renderToggleAll();
+        $this->registerAssets();
+    }
+
+    protected function renderInput()
+    {
+
+        $id = $this->options['id'];
+
+        if($this->firstItemEmpty){
+            $this->items = ['' => $this->placeholder ] +  $this->items;
         }
+
         // render input
-        echo $this->hasModel()
+        $input = $this->hasModel()
             ? Html::activeDropDownList($this->model, $this->attribute, $this->items , $this->options)
             : Html::dropDownList($this->name, $this->value, $this->items, $this->options);
 
-        $this->registerAssets();
+        echo $input;
     }
+
+
+    /**
+     * @author https://github.com/kartik-v/yii2-widget-select2
+     * @see tnx
+     */
+    protected function renderToggleAll()
+    {
+        if(!$this->options['multiple'] || !$this->toggleEnable){
+            return;
+        }
+        $settings = array_merge_recursive([
+            'selectLabel' => '<i class="glyphicon glyphicon-unchecked"></i>' . $this->selectLabel,
+            'unselectLabel' => '<i class="glyphicon glyphicon-check"></i>'   . $this->unselectLabel,
+            'selectOptions' => [],
+            'unselectOptions' => [],
+            'options' => ['class' => 's2-togall-button']
+        ],$this->toggleOptions);
+
+        $sOptions = $settings['selectOptions'];
+        $uOptions = $settings['unselectOptions'];
+        $options = $settings['options'];
+        $prefix = 's2-togall-';
+        Html::addCssClass($options, "{$prefix}select");
+        Html::addCssClass($sOptions, "s2-select-label");
+        Html::addCssClass($uOptions, "s2-unselect-label");
+        $options['id'] = $prefix . $this->options['id'];
+        $labels = Html::tag('span', $settings['selectLabel'], $sOptions) . Html::tag('span', $settings['unselectLabel'], $uOptions);
+        $out = Html::tag('span', $labels, $options);
+        echo Html::tag('span', $out, ['id' => 'parent-' . $options['id'], 'style' => 'display:none']);
+    }
+
 
     /**
      * Registers Assets
@@ -91,13 +145,16 @@ class Select2 extends \yii\widgets\InputWidget
     {
         $view = $this->getView();
         Select2Asset::register($view)->addLanguage($this->language);
+        KakSelect2Asset::register($view);
+
         if($this->theme == self::THEME_BOOTSTRAP) {
             ThemeBootstrap::register($view);
         }
+
         $id = $this->options['id'];
         $clientOptions = Json::htmlEncode($this->clientOptions);
 
-        $view->registerJs("jQuery('#{$id}').select2({$clientOptions});" , $view::POS_READY, self::JS_KEY . $this->options['id'] );
+        $view->registerJs("jQuery('#{$id}').kakSelect2({$clientOptions});" , $view::POS_READY, self::JS_KEY . $id );
         $this->registerEvents();
     }
 
@@ -142,7 +199,7 @@ class Select2 extends \yii\widgets\InputWidget
         }
 
         if ($this->multiple) {
-            $this->options['data-multiple'] = 'true';
+            $this->options['data-multiple'] = $this->boolToStr(true);
             $this->options['multiple'] = true;
         }
 
@@ -151,13 +208,20 @@ class Select2 extends \yii\widgets\InputWidget
             $this->options['multiple'] = true;
         }
 
+        if($this->loadItemsUrl!==null){
+            $this->options['data-load-items-url'] = Url::to($this->loadItemsUrl);
+        }
+
+        if ($this->toggleEnable)
+            $this->options['data-toggle-enable'] = $this->boolToStr($this->language);
+
         if ($this->language)
             $this->options['data-language'] = $this->language;
 
         if (isset($this->ajax)) {
             $this->options['data-ajax--url'] = Url::to($this->ajax);
 
-            $this->options['data-ajax--cache'] = $this->ajaxCache  ? 'true' : 'false';
+            $this->options['data-ajax--cache'] = $this->boolToStr($this->ajax);
             $this->options['data-minimum-input-length'] = $this->minimumInputLength;
         }
 
@@ -168,6 +232,11 @@ class Select2 extends \yii\widgets\InputWidget
 
         Html::addCssStyle($this->options,['width'=>'100%'],false);
         Html::addCssClass($this->options,'select2 form-control');
+    }
+
+    protected function boolToStr($var)
+    {
+        return $var===true ? 'true' : 'false';
     }
 
 }
