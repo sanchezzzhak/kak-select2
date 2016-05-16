@@ -91,7 +91,7 @@ class Select2 extends \yii\widgets\InputWidget
 
     protected function renderInput()
     {
-        if($this->firstItemEmpty && $this->multiple ){
+        if($this->firstItemEmpty && !$this->multiple ){
             $this->items = ['' => $this->placeholder ] +  $this->items;
         }
 
