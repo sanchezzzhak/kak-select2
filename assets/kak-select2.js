@@ -14,17 +14,33 @@
 }(this, function($) {
     'use strict';
 
+    var selector = {
+        base :'.kak-select2',
+        items_selected_multiple : '.select2-selection--multiple .select2-selection__rendered'
+    };
+
     // **********************************
     // Constructor
     // **********************************
     var kakSelect2 = function (element, options) {
         this.element = element;
         this.options = options;
-        this.initS2();
+        this.init();
     };
 
     kakSelect2.prototype = {
         constructor: kakSelect2,
+        init: function(){
+            this.destroy();
+            this.create();
+        },
+        create : function(){
+            this.initS2();
+        },
+        destroy : function(){
+
+        },
+
         // ----------------------------------
         // Methods to override
         // ----------------------------------
@@ -47,7 +63,6 @@
             });
             return deferred;
         },
-
         initS2:function(){
             $.when(
                 this.afterLoadData()
@@ -59,6 +74,18 @@
         initWidget: function(){
            // $el.show();
             $(this.element).select2(this.options);
+            this.initScroll();
+        },
+        initScroll: function(e) {
+            var self = this;
+            var scroll = $(this.element).data('scrollHeight');
+            if(!scroll){
+                return;
+            }
+            $(self.element).closest(selector.base).find(selector.items_selected_multiple).slimScroll({
+                height: ''
+            }).css('max-height',scroll+'px');
+
         },
         initS2ToggleAll : function () {
             var $el = $(this.element);
@@ -106,7 +133,6 @@
                 $el.select2('close').trigger('krajeeselect2:' + ev).trigger('change');
             });
         }
-
     };
 
     $.fn.kakSelect2 = function(option) {
@@ -117,3 +143,9 @@
     $.fn.kakSelect2.Constructor = kakSelect2;
 
 }));
+
+/*
+ select2-selection select2-selection--multiple
+ height: 150px;
+ overflow: auto;
+ */

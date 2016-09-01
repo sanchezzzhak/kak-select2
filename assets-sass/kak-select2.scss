@@ -30,3 +30,15 @@
 .s2-select-label .glyphicon, .s2-unselect-label .glyphicon {
   margin: auto 3px;
 }
+
+.kak-select2 .select2[data-item-width="auto"] .select2-selection--multiple .select2-selection__choice {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.kak-select2 .select2[data-item-width="100"] .select2-selection--multiple .select2-selection__choice {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 95%;
+  overflow: hidden;
+}

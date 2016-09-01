@@ -37,6 +37,10 @@ Once the extension is installed, simply use it in your code by  :
    'toggleEnable' => false,            // visible select all/unselect all
    'selectLabel' => 'select all',
    'unselectLabel' => 'unselect all',
+   'options' => [
+        'data-scroll-height' => 150,  // auto scroll
+        'data-item-width'    => 100,  // 100|auto
+   ]
    'multiple' => true,
    'value' => ['val1','val2'],
    'name' => 'inputName',

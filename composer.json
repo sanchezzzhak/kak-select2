@@ -12,7 +12,8 @@
     ],
     "require": {
         "yiisoft/yii2": "*",
-        "bower-asset/select2": "4.0.0"
+        "bower-asset/select2": "4.0.0",
+        "bower-asset/slimScroll": ">=1.3.3"
     },
     "extra": {
         "asset-installer-paths": {

@@ -9,6 +9,7 @@ use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\JsExpression;
 
+
 class Select2 extends \yii\widgets\InputWidget
 {
     const JS_KEY = 'kak/select2/';
@@ -95,12 +96,20 @@ class Select2 extends \yii\widgets\InputWidget
             $this->items = ['' => $this->placeholder ] +  $this->items;
         }
 
+        if(isset($this->options['itemWidthAuto']) && !$this->options['itemWidthAuto']){
+            Html::addCssClass($this->options,'select2-auto');
+        }else{
+            Html::addCssClass($this->options,'select2-width100');
+        }
+
+
         // render input
         $input = $this->hasModel()
             ? Html::activeDropDownList($this->model, $this->attribute, $this->items , $this->options)
             : Html::dropDownList($this->name, $this->value, $this->items, $this->options);
 
-        echo $input;
+
+        echo Html::tag('div',$input,['class' => 'kak-select2']);
     }
 
 

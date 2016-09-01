@@ -1,7 +1,6 @@
 .s2-togall-select .s2-unselect-label,
 .s2-togall-unselect .s2-select-label {
-  display: none;
-}
+  display: none; }
 
 .s2-togall-button {
   display: inline-block;
@@ -25,5 +24,16 @@
 
 .s2-select-label .glyphicon, .s2-unselect-label .glyphicon {
   margin: auto 3px; }
+
+.kak-select2 select[data-item-width="auto"] ~ .select2 .select2-selection--multiple .select2-selection__choice {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden; }
+
+.kak-select2 select[data-item-width="100"] ~ .select2 .select2-selection--multiple .select2-selection__choice {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 95%;
+  overflow: hidden; }
 
 /*# sourceMappingURL=kak-select2.css.map */

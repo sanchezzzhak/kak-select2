@@ -8,6 +8,7 @@ class KakSelect2Asset extends AssetBundle
 
     public $depends = [
         'yii\web\JqueryAsset',
+        '\kak\widgets\select2\SlimScrollAsset'
     ];
     public $js = [
         'kak-select2.js'
