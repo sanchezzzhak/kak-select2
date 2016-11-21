@@ -102,9 +102,14 @@ class Select2 extends \yii\widgets\InputWidget
             Html::addCssClass($this->options,'select2-width100');
         }
 
+        // auto load get data
+        $isModel =  $this->hasModel();
+        if(!$isModel && $this->value === null){
+            $this->value = \Yii::$app->request->get($this->name);
+        }
 
         // render input
-        $input = $this->hasModel()
+        $input = $isModel
             ? Html::activeDropDownList($this->model, $this->attribute, $this->items , $this->options)
             : Html::dropDownList($this->name, $this->value, $this->items, $this->options);
 
