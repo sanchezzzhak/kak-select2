@@ -2,13 +2,13 @@
 
 namespace kak\widgets\select2;
 
-use yii\web\AssetByndle;
+use yii\web\AssetBundle;
 
 /**
  * Class KakSelect2LanguageAsset
  * @package kak\widgets\select2
  */
-class KakSelect2LanguageAsset extends AssetByndle
+class KakSelect2LanguageAsset extends AssetBundle
 {
     public $sourcePath = '@bower/select2/dist';
 
