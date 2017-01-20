@@ -6,8 +6,7 @@ class ThemeBootstrap extends AssetBundle
 {
     public $sourcePath = '@vendor/kak/select2/assets';
 
-    public function init()
-    {
-        $this->css[] = 'select2-bootstrap-theme' . (!YII_DEBUG ? ".min" : "") . ".css";
-    }
+    public $css = [
+        'select2-bootstrap-theme' . (!YII_DEBUG ? '.min' : '') . '.css',
+    ];
 }
