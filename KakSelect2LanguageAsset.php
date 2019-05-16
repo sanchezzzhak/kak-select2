@@ -22,10 +22,15 @@ class KakSelect2LanguageAsset extends AssetBundle
      * @param $lang
      * @return $this
      */
-    public function addLanguage($lang)
+    public function addLanguage($lang = null)
     {
+        if($lang === false) {
+            return $this;
+        }
+        
         $lang = !empty($lang) ? $lang : 'en';
         $this->js[] = 'js/i18n/' . $lang . '.js';
+        
         return $this;
     }
 }

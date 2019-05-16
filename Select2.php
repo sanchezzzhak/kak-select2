@@ -157,6 +157,7 @@ class Select2 extends \yii\widgets\InputWidget
         $view = $this->getView();
         Select2Asset::register($view);
         KakSelect2Asset::register($view);
+        
         KakSelect2LanguageAsset::register($view)->addLanguage($this->language);
 
         if($this->theme == self::THEME_BOOTSTRAP) {
