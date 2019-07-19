@@ -6,6 +6,13 @@ class KakSelect2Asset extends AssetBundle
 {
     public $sourcePath = '@vendor/kak/select2/assets';
 
+    public function init()
+    {
+        parent::init();
+        $this->publishOptions['forceCopy'] = true;
+    }
+
+
     public $depends = [
         'yii\web\JqueryAsset',
         '\kak\widgets\select2\SlimScrollAsset'

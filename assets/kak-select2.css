@@ -1,39 +1,94 @@
 .s2-togall-select .s2-unselect-label,
 .s2-togall-unselect .s2-select-label {
-  display: none; }
+  display: none;
+}
 
 .s2-togall-button {
   display: inline-block;
   font-weight: 400;
   color: #337ab7;
   padding: 8px 3px;
-  cursor: pointer; }
+  cursor: pointer;
+}
 
 .s2-togall-button:focus, .s2-togall-button:hover {
   color: #23527c;
   text-decoration: underline;
-  background-color: transparent; }
+  background-color: transparent;
+}
 
 .s2-togall-select .s2-select-label,
 .s2-togall-unselect .s2-unselect-label {
-  display: inline; }
+  display: inline;
+}
 
 .s2-select-label, .s2-unselect-label {
   line-height: 1.1;
-  font-size: 12px; }
+  font-size: 12px;
+}
 
 .s2-select-label .glyphicon, .s2-unselect-label .glyphicon {
-  margin: auto 3px; }
+  margin: auto 3px;
+}
 
-.kak-select2 select[data-item-width="auto"] ~ .select2 .select2-selection--multiple .select2-selection__choice {
+.kak-select2 .select2[data-item-width=auto] .select2-selection--multiple .select2-selection__choice {
   text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden; }
+  overflow: hidden;
+}
 
-.kak-select2 select[data-item-width="100"] ~ .select2 .select2-selection--multiple .select2-selection__choice {
+.kak-select2 .select2[data-item-width="100"] .select2-selection--multiple .select2-selection__choice {
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 95%;
-  overflow: hidden; }
+  overflow: hidden;
+}
+
+.kak-select2 {
+  position: relative;
+}
+
+.kak-select2 .preloader {
+  text-align: center;
+  margin: 0 auto 1em;
+  width: 25px;
+  height: 25px;
+  border-radius: 100%;
+  position: absolute;
+  z-index: 5;
+  right: 40px;
+  top: 5px;
+  user-select: none;
+}
+.kak-select2 .preloader .loader-1:before, .kak-select2 .preloader .loader-1:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 100%;
+  border: 10px solid transparent;
+  border-top-color: #337ab7;
+}
+.kak-select2 .preloader .loader-1:before {
+  z-index: 100;
+  animation: spin 1s infinite;
+}
+.kak-select2 .preloader .loader-1:after {
+  border: 3px solid #ccc;
+}
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
 
 /*# sourceMappingURL=kak-select2.css.map */

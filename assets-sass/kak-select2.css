@@ -1,28 +1,69 @@
 .s2-togall-select .s2-unselect-label,
 .s2-togall-unselect .s2-select-label {
-  display: none; }
+  display: none;
+}
 
 .s2-togall-button {
   display: inline-block;
   font-weight: 400;
   color: #337ab7;
   padding: 8px 3px;
-  cursor: pointer; }
+  cursor: pointer;
+}
 
 .s2-togall-button:focus, .s2-togall-button:hover {
   color: #23527c;
   text-decoration: underline;
-  background-color: transparent; }
+  background-color: transparent;
+}
 
 .s2-togall-select .s2-select-label,
 .s2-togall-unselect .s2-unselect-label {
-  display: inline; }
+  display: inline;
+}
 
 .s2-select-label, .s2-unselect-label {
   line-height: 1.1;
-  font-size: 12px; }
+  font-size: 12px;
+}
 
 .s2-select-label .glyphicon, .s2-unselect-label .glyphicon {
-  margin: auto 3px; }
+  margin: auto 3px;
+}
+
+.kak-select2 .select2[data-item-width=auto] .select2-selection--multiple .select2-selection__choice {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.kak-select2 .select2[data-item-width="100"] .select2-selection--multiple .select2-selection__choice {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 95%;
+  overflow: hidden;
+}
+
+.kak-select2 .preloader {
+  height: 24px;
+  width: 24px;
+  text-align: center;
+  margin: 0 auto 1em;
+  display: inline-block;
+  vertical-align: top;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 4;
+}
+.kak-select2 .preloader img {
+  width: 100%;
+  height: 100%;
+}
+.kak-select2 .preloader svg path,
+.kak-select2 .preloader svg rect {
+  fill: #337ab7;
+}
 
 /*# sourceMappingURL=kak-select2.css.map */

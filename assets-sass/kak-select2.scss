@@ -1,6 +1,6 @@
 .s2-togall-select .s2-unselect-label,
 .s2-togall-unselect .s2-select-label {
-  display:none;
+  display: none;
 }
 
 .s2-togall-button {
@@ -11,15 +11,15 @@
   cursor: pointer;
 }
 
-.s2-togall-button:focus,.s2-togall-button:hover {
-  color:#23527c;
-  text-decoration:underline;
-  background-color:transparent;
+.s2-togall-button:focus, .s2-togall-button:hover {
+  color: #23527c;
+  text-decoration: underline;
+  background-color: transparent;
 }
 
 .s2-togall-select .s2-select-label,
 .s2-togall-unselect .s2-unselect-label {
-  display:inline;
+  display: inline;
 }
 
 .s2-select-label, .s2-unselect-label {
@@ -36,9 +36,65 @@
   white-space: nowrap;
   overflow: hidden;
 }
+
 .kak-select2 .select2[data-item-width="100"] .select2-selection--multiple .select2-selection__choice {
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 95%;
   overflow: hidden;
+}
+
+.kak-select2 {
+  position: relative;
+}
+
+.kak-select2 .preloader {
+  text-align: center;
+  margin: 0 auto 1em;
+  width: 25px;
+  height: 25px;
+  border-radius: 100%;
+  position: absolute;
+  z-index: 5;
+  right: 40px;
+  top: 5px;
+  user-select: none;
+
+  .loader-1:before, .loader-1:after{
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    border: 10px solid transparent;
+    border-top-color: #337ab7;
+  }
+
+  .loader-1:before{
+    z-index: 100;
+    animation: spin 1s infinite;
+  }
+
+  .loader-1:after{
+    border: 3px solid #ccc;
+  }
+
+  @keyframes spin{
+    0%{
+      -webkit-transform: rotate(0deg);
+      -ms-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+
+    100%{
+      -webkit-transform: rotate(360deg);
+      -ms-transform: rotate(360deg);
+      -o-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
+
+
 }
