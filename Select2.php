@@ -127,13 +127,13 @@ class Select2 extends \yii\widgets\InputWidget
         if(!$this->multiple || !$this->toggleEnable){
             return;
         }
-        $settings = array_merge_recursive([
+        $settings = ArrayHelper::merge([
             'selectLabel' => '<i class="glyphicon glyphicon-unchecked"></i>' . $this->selectLabel,
             'unselectLabel' => '<i class="glyphicon glyphicon-check"></i>'   . $this->unselectLabel,
             'selectOptions' => [],
             'unselectOptions' => [],
             'options' => ['class' => 's2-togall-button']
-        ],$this->toggleOptions);
+        ], $this->toggleOptions);
 
         $sOptions = $settings['selectOptions'];
         $uOptions = $settings['unselectOptions'];
