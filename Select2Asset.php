@@ -3,6 +3,7 @@
 namespace kak\widgets\select2;
 
 use yii\web\AssetBundle;
+use yii\web\JqueryAsset;
 
 /**
  * Class Select2Asset
@@ -21,7 +22,7 @@ class Select2Asset extends AssetBundle
     ];
 
     public $depends = [
-        'yii\web\JqueryAsset'
+        JqueryAsset::class
     ];
 
 } 
