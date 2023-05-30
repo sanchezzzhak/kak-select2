@@ -17,7 +17,7 @@
   "require": {
     "yiisoft/yii2": "*",
     "bower-asset/select2": "^4.0",
-    "bower-asset/jquery-slimscroll": "*"
+    "bower-asset/slimscroll": "*"
   },
   "require-dev": {
     "symfony/event-dispatcher-contracts": ">=2.2.0",

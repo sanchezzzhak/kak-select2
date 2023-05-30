@@ -13,4 +13,13 @@ class SlimScrollAsset extends AssetBundle
     public $js = [
         'jquery.slimscroll.min.js'
     ];
-} 
+
+    public $publishOptions = [
+        'only' => [
+            'jquery.slimscroll.min.js',
+        ],
+        'except' => [
+            'examples',
+        ]
+    ];
+}
