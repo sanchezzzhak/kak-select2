@@ -1,3 +1,8 @@
+:root {
+  --select2-toggle-btn-color: #337ab7;
+  --select2-toggle-btn-hover: #23527c;
+}
+
 .s2-togall-select .s2-unselect-label,
 .s2-togall-unselect .s2-select-label {
   display:none;
@@ -6,13 +11,13 @@
 .s2-togall-button {
   display: inline-block;
   font-weight: 400;
-  color: #337ab7;
+  color: var(--select2-toggle-btn-color);
   padding: 8px 3px;
   cursor: pointer;
 }
 
 .s2-togall-button:focus,.s2-togall-button:hover {
-  color:#23527c;
+  color: var(--select2-toggle-btn-hover);
   text-decoration:underline;
   background-color:transparent;
 }
@@ -31,25 +36,35 @@
   margin: auto 3px;
 }
 
-.kak-select2 .select2[data-item-width="auto"] .select2-selection--multiple .select2-selection__choice {
+.select2[data-item-width="auto"] .select2-selection--multiple .select2-selection__choice {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
 }
-.kak-select2 .select2[data-item-width="100"] .select2-selection--multiple .select2-selection__choice {
+.select2[data-item-width="100"] .select2-selection--multiple .select2-selection__choice {
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 95%;
   overflow: hidden;
 }
 
-.kak-select2 select[data-item-width="auto"] ~ .select2 .select2-selection--multiple .select2-selection__choice {
+select[data-item-width="auto"] ~ .select2 .select2-selection--multiple .select2-selection__choice {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden; }
 
-.kak-select2 select[data-item-width="100"] ~ .select2 .select2-selection--multiple .select2-selection__choice {
+select[data-item-width="100"] ~ .select2 .select2-selection--multiple .select2-selection__choice {
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 95%;
   overflow: hidden; }
+
+.select2-container .select2-selection {
+  overflow: hidden;
+}
+.select2-pre-loading {
+
+}
+.pre-loading .select2-container {
+  display: none;
+}

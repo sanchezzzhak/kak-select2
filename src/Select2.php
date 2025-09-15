@@ -2,6 +2,7 @@
 
 namespace kak\widgets\select2;
 
+use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -41,11 +42,23 @@ class Select2 extends InputWidget
 
 
     public bool $autoLanguage = true;
-    /** @var string - Specify the language used for Select2 messages. https://select2.org/i18n#message-translations */
+    /**
+     * @var null|string Specify the language used for Select2 messages.
+     * @see https://select2.org/i18n#message-translations
+     */
     public ?string $language = null;
-    public array $options = [];
+
     /** @var string|array */
     public $loadItemsUrl;
+
+    public string $loadIndicator = '<div class="select2-pre-loading">loading </div>';
+
+    public bool $showLoad = true;
+
+    public bool $showCounter = true;
+    public int $countCounter = 0;
+    public int $maxShowItem = 3;
+
     /** @var string|array */
     public $ajax;
     /** @var bool */
@@ -68,8 +81,9 @@ class Select2 extends InputWidget
     public array $items = [];
 
     public bool $firstItemEmpty = false;
-    public string $selectLabel = 'Select all';
-    public string $unselectLabel = 'Unselect all';
+
+    public string $selectLabel = '';
+    public string $unselectLabel = '';
 
     public string $selectIcon = '<i class="glyphicon glyphicon-unchecked"></i>';
     public string $unSelectIcon = '<i class="glyphicon glyphicon-check"></i>';
@@ -77,9 +91,19 @@ class Select2 extends InputWidget
     public bool $toggleEnable = true;
     public array $toggleOptions = [];
 
+    public string $template = '{input}{toggle}';
+
     public function init()
     {
         parent::init();
+
+        if ($this->selectLabel === '') {
+            $this->selectLabel = Yii::t('app', 'Select all');
+        }
+        if ($this->unselectLabel === '') {
+            $this->unselectLabel = Yii::t('app', 'Unselect all');
+        }
+
         $this->initOption();
         $this->initLanguageOption();
     }
@@ -95,15 +119,18 @@ class Select2 extends InputWidget
      */
     protected function renderWidget(): void
     {
-        $this->renderInput();
-        $this->renderToggleAll();
+        echo strtr($this->template, [
+            '{input}' => $this->renderInput(),
+            '{toggle}' => $this->renderToggleAll(),
+        ]);
+
         $this->registerAssets();
     }
 
     /**
      * render standard input or active input
      */
-    protected function renderInput(): void
+    protected function renderInput(): string
     {
         if ($this->firstItemEmpty && !$this->multiple) {
             $this->items = ['' => $this->placeholder] + $this->items;
@@ -118,16 +145,20 @@ class Select2 extends InputWidget
         // auto load get data
         $isModel = $this->hasModel();
         if (!$isModel && $this->value === null) {
-            $this->value = \Yii::$app->request->get($this->name);
+            $this->value = Yii::$app->request->get($this->name);
+        }
+
+        // render load indicator
+        if ($this->showLoad) {
+            $input[] = $this->loadIndicator;
         }
 
         // render input
-        $input = $isModel
+        $input[] = $isModel
             ? Html::activeDropDownList($this->model, $this->attribute, $this->items, $this->options)
             : Html::dropDownList($this->name, $this->value, $this->items, $this->options);
 
-
-        echo Html::tag('div', $input, ['class' => 'kak-select2']);
+        return Html::tag('div', implode(PHP_EOL, $input), ['class' => 'kak-select2']);
     }
 
 
@@ -135,10 +166,10 @@ class Select2 extends InputWidget
      * @author https://github.com/kartik-v/yii2-widget-select2
      * @see tnx
      */
-    protected function renderToggleAll(): void
+    protected function renderToggleAll(): string
     {
         if (!$this->multiple || !$this->toggleEnable) {
-            return;
+            return '';
         }
 
         $selectIcon = stripos($this->selectIcon, '<i') !== false
@@ -174,16 +205,16 @@ class Select2 extends InputWidget
         );
 
         $out = Html::tag('span', $labels, $options);
-        echo Html::tag('span', $out, ['id' => 'parent-' . $options['id'], 'style' => 'display:none']);
+        return Html::tag('span', $out, ['id' => 'parent-' . $options['id'], 'style' => 'display:none']);
     }
 
     /**
      * take language initialization from framework settings if not specified $this->language property
      */
-    protected function initLanguageOption()
+    protected function initLanguageOption(): void
     {
-        if ($this->autoLanguage && $this->language !== false && empty($this->language)) {
-            $languageApp = \Yii::$app->language;
+        if ($this->autoLanguage && (string)$this->language === '') {
+            $languageApp = Yii::$app->language;
             if ($languageApp !== '') {
                 $this->language = $languageApp;
             }
@@ -193,12 +224,12 @@ class Select2 extends InputWidget
     /**
      * Registers assets
      */
-    public function registerAssets()
+    public function registerAssets(): void
     {
         $view = $this->getView();
+
         Select2Asset::register($view);
         KakSelect2Asset::register($view);
-
         KakSelect2LanguageAsset::register($view)->addLanguage($this->language);
 
         if ((string)$this->theme === self::THEME_BOOTSTRAP) {
@@ -207,6 +238,7 @@ class Select2 extends InputWidget
 
         $id = $this->options['id'];
         $clientOptions = Json::htmlEncode($this->clientOptions);
+
 
         $view->registerJs("jQuery('#{$id}').kakSelect2({$clientOptions});", $view::POS_READY, self::JS_KEY . $id);
         $this->registerEvents();
@@ -219,10 +251,6 @@ class Select2 extends InputWidget
     {
         $view = $this->getView();
         $selector = '#' . $this->options['id'];
-
-        if (empty($this->events)) {
-            return;
-        }
 
         $js = [];
 
@@ -297,6 +325,10 @@ class Select2 extends InputWidget
 
         Html::addCssStyle($this->options, ['width' => '100%'], false);
         Html::addCssClass($this->options, 'select2 form-control');
+
+        $this->options['data-show-counter'] = $this->boolToStr($this->showCounter);
+        $this->options['data-count-counter'] = $this->countCounter;
+        $this->options['data-max-show-items'] = $this->maxShowItem;
     }
 
     /**

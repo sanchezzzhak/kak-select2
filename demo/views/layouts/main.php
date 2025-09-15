@@ -2,6 +2,7 @@
 
 use yii\bootstrap\BootstrapAsset;
 use yii\helpers\Html;
+use yii\web\JqueryAsset;
 use yii\web\View;
 
 /**
@@ -9,11 +10,12 @@ use yii\web\View;
  * @var View $this
  */
 
+
 BootstrapAsset::register($this);
+JqueryAsset::register($this)
 
 ?>
-<?php $this->beginPage() ?>
-    <!DOCTYPE html>
+<?php $this->beginPage() ?><!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
     <head>
         <meta charset="<?= Yii::$app->charset ?>">
@@ -26,7 +28,6 @@ BootstrapAsset::register($this);
 <?php $this->beginBody() ?>
 <div class="content content-full-width" id="content">
     <div class="container-fluid">
-
         <?= $content ?>
     </div>
 </div>

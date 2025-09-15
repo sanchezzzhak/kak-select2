@@ -25,4 +25,8 @@ class Select2Asset extends AssetBundle
         JqueryAsset::class
     ];
 
+    public $publishOptions = [
+        'forceCopy' => true,
+    ];
+
 } 
