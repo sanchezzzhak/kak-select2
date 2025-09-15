@@ -52,12 +52,13 @@ class Select2 extends InputWidget
     public $loadItemsUrl;
 
     public string $loadIndicator = '<div class="select2-pre-loading">loading </div>';
+    public int $loadingDelay = 500;
+    public bool $loadingShow = true;
 
-    public bool $showLoad = true;
-
-    public bool $showCounter = true;
-    public int $countCounter = 0;
-    public int $maxShowItem = 3;
+    public bool $counterShow = true;
+    public string $counterTemplate = '<span class="select2-counter"><span>0</span> of <span>0</span></span>';
+    public int $counterCount = 0;
+    public int $maxShowItems = 3;
 
     /** @var string|array */
     public $ajax;
@@ -148,17 +149,19 @@ class Select2 extends InputWidget
             $this->value = Yii::$app->request->get($this->name);
         }
 
+        $this->counterCount = count($this->items);
+
         // render load indicator
-        if ($this->showLoad) {
-            $input[] = $this->loadIndicator;
+        if ($this->loadingShow) {
+            $output[] = $this->loadIndicator;
         }
 
         // render input
-        $input[] = $isModel
+        $output[] = $isModel
             ? Html::activeDropDownList($this->model, $this->attribute, $this->items, $this->options)
             : Html::dropDownList($this->name, $this->value, $this->items, $this->options);
 
-        return Html::tag('div', implode(PHP_EOL, $input), ['class' => 'kak-select2']);
+        return Html::tag('div', implode(PHP_EOL, $output), ['class' => 'kak-select2']);
     }
 
 
@@ -326,9 +329,11 @@ class Select2 extends InputWidget
         Html::addCssStyle($this->options, ['width' => '100%'], false);
         Html::addCssClass($this->options, 'select2 form-control');
 
-        $this->options['data-show-counter'] = $this->boolToStr($this->showCounter);
-        $this->options['data-count-counter'] = $this->countCounter;
-        $this->options['data-max-show-items'] = $this->maxShowItem;
+        $this->options['data-counter-show'] = $this->boolToStr($this->counterShow);
+        $this->options['data-counter-template'] = $this->counterTemplate;
+        $this->options['data-counter-count'] = $this->counterCount;
+        $this->options['data-max-show-items'] = $this->maxShowItems;
+        $this->options['data-loading-delay'] = $this->loadingDelay;
     }
 
     /**

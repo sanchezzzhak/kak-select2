@@ -62,8 +62,24 @@ select[data-item-width="100"] ~ .select2 .select2-selection--multiple .select2-s
   overflow: hidden;
 }
 
-.select2-container .select2-selection {
-  overflow: hidden;
+.kak-select2 {
+  position: relative;
+}
+
+.select2-counter {
+  pointer-events: none;
+  position: absolute;
+  right: 25px;
+  z-index: 1;
+  top: 6.5px;
+}
+
+.select2-pre-loading {
+  display: none;
+  line-height: 28px;
+}
+.select2-pre-loading.show {
+  display: block;
 }
 
 .pre-loading .select2-container {

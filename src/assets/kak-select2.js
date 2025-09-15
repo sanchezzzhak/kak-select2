@@ -39,7 +39,7 @@
 		}
 
 		afterLoadData() {
-			const $el = $(this.element);
+			const $el = this.getElement();
 			return new Promise((resolve, reject) => {
 				if (!$el.data('loadItemsUrl')) {
 					resolve('afterLoadData not load');
@@ -61,17 +61,18 @@
 			await this.afterLoadData();
 			this.initWidget();
 			this.initScroll();
+			this.initCounter();
 			this.initS2ToggleAll();
 			this.hideLoading()
 		}
 
 		getPreLoading() {
-			return $(this.element).parent().find('.select2-pre-loading')
+			return this.getElement().parent().find('.select2-pre-loading')
 		}
 
 		showLoading() {
 			let loading = this.getPreLoading();
-			let container = $(this.element).parent();
+			let container = this.getElement().parent();
 			if (loading) {
 				container.addClass('pre-loading');
 				loading.addClass('show');
@@ -80,7 +81,7 @@
 
 		hideLoading() {
 			let loading = this.getPreLoading();
-			let el = $(this.element);
+			let el = this.getElement();
 			let container = el.parent();
 			setTimeout(() => {
 				if (loading) {
@@ -91,19 +92,103 @@
 
 		}
 
-		initWidget() {
-			let loading = this.getPreLoading()
-			// $el.show();
-			$(this.element).select2(this.options);
+		getSelectContainer() {
+			return this.getElement().closest(selector.base)
+				.find('.select2-container .select2-selection');
+		}
 
+		getElement() {
+			return $(this.element)
+		}
+
+		getSelectSearch() {
+			return this.getSelectContainer().find('.select2-search__field');
+		}
+
+		getSelectCounter() {
+			return this.getSelectContainer().find('.select2-counter');
+		}
+
+		getSelectChoices() {
+			return this.getSelectContainer().find('.select2-selection__choice');
+		}
+
+		updateCounterSelect(value) {
+			this.getSelectCounter().find('span:eq(0)').text(value)
+		}
+
+
+		updateCounterMax(value) {
+			this.getSelectCounter().find('span:eq(1)').text(value)
+		}
+
+		updateCounter() {
+			const el = this.getElement();
+			const selectCounter = this.getSelectCounter()
+
+			const selectedFilters = this.getSelectChoices();
+			const availableWidth = parseInt(this.getSelectContainer().width())
+				- (selectCounter.length ? selectCounter.width() : 0) - parseInt(getComputedStyle(selectCounter.get(0)).right);
+
+			const optionCount = this.getElement().find('option').length;
+			const counterMax = parserInt(el.data('counterCount') || 0)
+
+			this.updateCounterSelect(selectedFilters.length)
+			this.updateCounterMax(counterMax > 0 && counterMax !== optionCount
+				? counterMax: optionCount)
+
+			let selectedFiltersWidth = 0;
+			selectedFilters.each(function () {
+				selectedFiltersWidth += $(this).outerWidth();
+			});
+			const maxShowItems = parseInt(el.data('maxShowItems'));
+			const isShow = selectedFiltersWidth < availableWidth &&
+				selectedFilters.length > 0 && selectedFilters.length <= maxShowItems && maxShowItems > 0;
+			if (isShow) {
+				selectedFilters.show();
+			} else {
+				selectedFilters.hide();
+			}
+
+			this.updatePlaceholder();
+		}
+
+		updatePlaceholder() {
+			const placeholder = this.getElement().data('placeholder');
+			this.getSelectSearch().attr('placeholder', placeholder);
+		}
+
+		initCounter() {
+			const el = this.getElement();
+			const container = this.getSelectContainer();
+			container.append($(el.data('counterTemplate')))
+			this.updateCounter();
+
+			this.getElement()
+				.on('select2:open change select2:change select2:close select2:open',  (e) => {
+					if (e.type === 'select2:open') {
+						const searchField = this.getSelectSearch();
+						const selectedFilters = this.getSelectChoices();
+						selectedFilters.hide();
+						searchField.show();
+						this.updatePlaceholder();
+						searchField.focus();
+					} else {
+						this.updateCounter();
+					}
+				});
+		}
+
+		initWidget() {
+			this.getElement().select2(this.options);
 		}
 
 		initScroll(e) {
-			const scroll = $(this.element).data('scrollHeight');
+			const scroll = this.getElement().data('scrollHeight');
 			if (!scroll) {
 				return;
 			}
-			$(this.element)
+			this.getElement()
 				.closest(selector.base)
 				.find(selector.items_selected_multiple)
 				.slimScroll({height: ''})
@@ -111,13 +196,21 @@
 
 		}
 
+		isToggleEnable() {
+			return !!this.getElement().data('toggleEnable')
+		}
+
+		isMultiple() {
+			return !!this.getElement().attr('multiple')
+		}
+
 		initS2ToggleAll() {
-			const $el = $(this.element);
+			const $el = this.getElement();
 			const id = $el.attr('id'),
 				togId = '#' + 's2-togall-' + id,
 				$tog = $(togId);
 
-			if (!$el.attr('multiple') || !$el.data('toggleEnable')) {
+			if (!this.isMultiple()|| !this.isToggleEnable()) {
 				return;
 			}
 
@@ -153,7 +246,7 @@
 			const EVENT_UNSELECTALL = 'unselectall';
 
 			$tog.off('.kak-select2').on('click.kak-select2', function () {
-				const $search = $el.closest('.kak-select2').find('input.select2-search__field');
+				const $search = $el.closest(selector.base).find('input.select2-search__field');
 				const $options = $('.select2-results__options li');
 				const isSelect = $tog.hasClass('s2-togall-select');
 				let flag = true;
