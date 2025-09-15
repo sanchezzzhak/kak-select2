@@ -1,5 +1,6 @@
 <?php
 namespace kak\widgets\select2;
+
 use yii\web\AssetBundle;
 
 class ThemeBootstrap extends AssetBundle

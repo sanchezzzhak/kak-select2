@@ -15,19 +15,18 @@
     }
   ],
   "require": {
+    "php": ">=7.4",
     "yiisoft/yii2": "*",
     "bower-asset/select2": "^4.0",
     "bower-asset/slimscroll": "*"
   },
   "require-dev": {
     "symfony/event-dispatcher-contracts": ">=2.2.0",
-    "codeception/codeception": ">=4.1.22",
-    "codeception/module-asserts": ">=1.3",
-    "codeception/module-yii2": ">=1.1"
+    "yiisoft/yii2-bootstrap": "*"
   },
   "autoload": {
     "psr-4": {
-      "kak\\widgets\\select2\\": ""
+      "kak\\widgets\\select2\\": "src"
     }
   },
   "repositories": [
@@ -40,5 +39,10 @@
     "allow-plugins": {
       "yiisoft/yii2-composer": false
     }
+  },
+  "archive": {
+    "exclude": [
+      "/demo"
+    ]
   }
 }

@@ -33,7 +33,7 @@ Once the extension is installed, simply use it in your code by  :
 
 ```php
 
-<?= \kak\widgets\select2\Select2::widget([
+<?= \kak\widgets\select2\src\Select2::widget([
    'toggleEnable' => false,            // visible select all/unselect all
    'selectLabel' => 'select all',
    'unselectLabel' => 'unselect all',
@@ -55,7 +55,7 @@ Once the extension is installed, simply use it in your code by  :
 
 ```php
 
-<?= $form->field($model, 'list')->widget('\kak\widgets\select2\Select2', [
+<?= $form->field($model, 'list')->widget('\kak\widgets\select2\src\Select2', [
     'items' => [
         'val1' => 'options1',
         'val2' => 'options2',

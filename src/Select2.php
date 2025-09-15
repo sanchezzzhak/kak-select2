@@ -15,36 +15,35 @@ use yii\widgets\InputWidget;
  */
 class Select2 extends InputWidget
 {
-    const JS_KEY = 'kak/select2/';
+    private const JS_KEY = 'kak/select2/';
 
-    const THEME_DEFAULT = 'classic';
-    const THEME_BOOTSTRAP = 'bootstrap';
+    public const THEME_DEFAULT = 'classic';
+    public const THEME_BOOTSTRAP = 'bootstrap';
 
     //  Triggered whenever an option is selected or removed.
-    const EVENT_CHANGE = 'change';
+    public const EVENT_CHANGE = 'change';
     //  Triggered whenever the dropdown is closed.
-    const EVENT_CLOSE = 'select2:close';
+    public const EVENT_CLOSE = 'select2:close';
     // Triggered before the dropdown is closed. This event can be prevented.
-    const EVENT_CLOSING = 'select2:closing';
+    public const EVENT_CLOSING = 'select2:closing';
     //  Triggered whenever the dropdown is opened.
-    const EVENT_OPEN = 'select2:open';
+    public const EVENT_OPEN = 'select2:open';
     //  Triggered before the dropdown is opened. This event can be prevented.
-    const EVENT_OPENING = 'select2:opening';
+    public const EVENT_OPENING = 'select2:opening';
     //  Triggered before a result is selected. This event can be prevented.
-    const EVENT_SELECT = 'select2:select';
+    public const EVENT_SELECT = 'select2:select';
     //  Triggered whenever a result is selected.
-    const EVENT_SELECTING = 'select2:selecting';
+    public const EVENT_SELECTING = 'select2:selecting';
     //  Triggered whenever a selection is removed.
-    const EVENT_UNSELECT = 'select2:unselect';
+    public const EVENT_UNSELECT = 'select2:unselect';
     //  Triggered before a selection is removed. This event can be prevented.
-    const EVENT_UNSELECTING = 'select2:unselecting';
+    public const EVENT_UNSELECTING = 'select2:unselecting';
 
 
-    public $autoLanguage = true;
+    public bool $autoLanguage = true;
     /** @var string - Specify the language used for Select2 messages. https://select2.org/i18n#message-translations */
-    public $language;
-    /** @var array */
-    public $options = [];
+    public ?string $language = null;
+    public array $options = [];
     /** @var string|array */
     public $loadItemsUrl;
     /** @var string|array */
@@ -52,33 +51,31 @@ class Select2 extends InputWidget
     /** @var bool */
     public $ajaxCache = true;
     /** @var int - Minimum number of characters required to start a search. */
-    public $minimumInputLength = 0;
+    public int $minimumInputLength = 0;
     /** @var array|null */
-    public $tags;
+    public ?array $tags = null;
     /** @var bool */
-    public $multiple = false;
+    public bool $multiple = false;
     /** @var string */
-    public $theme = self::THEME_BOOTSTRAP;
+    public string $theme = self::THEME_BOOTSTRAP;
     /** @var string|null */
-    public $placeholder;
+    public ?string $placeholder = null;
     /** @var array */
-    public $events = [];
+    public array $events = [];
     /** @var array */
-    public $clientOptions = [
-
-    ];
+    public array $clientOptions = [];
     /** @var array */
-    public $items = [];
+    public array $items = [];
 
-    public $firstItemEmpty = false;
+    public bool $firstItemEmpty = false;
+    public string $selectLabel = 'Select all';
+    public string $unselectLabel = 'Unselect all';
 
-    public $selectLabel = 'Select all';
-    public $unselectLabel = 'Unselect all';
-    public $selectIcon = '<i class="glyphicon glyphicon-unchecked"></i>';
-    public $unSelectIcon = '<i class="glyphicon glyphicon-check"></i>';
+    public string $selectIcon = '<i class="glyphicon glyphicon-unchecked"></i>';
+    public string $unSelectIcon = '<i class="glyphicon glyphicon-check"></i>';
 
-    public $toggleEnable = true;
-    public $toggleOptions = [];
+    public bool $toggleEnable = true;
+    public array $toggleOptions = [];
 
     public function init()
     {
@@ -96,7 +93,7 @@ class Select2 extends InputWidget
     /**
      * render widget HTML
      */
-    protected function renderWidget()
+    protected function renderWidget(): void
     {
         $this->renderInput();
         $this->renderToggleAll();
@@ -106,7 +103,7 @@ class Select2 extends InputWidget
     /**
      * render standard input or active input
      */
-    protected function renderInput()
+    protected function renderInput(): void
     {
         if ($this->firstItemEmpty && !$this->multiple) {
             $this->items = ['' => $this->placeholder] + $this->items;
@@ -138,7 +135,7 @@ class Select2 extends InputWidget
      * @author https://github.com/kartik-v/yii2-widget-select2
      * @see tnx
      */
-    protected function renderToggleAll()
+    protected function renderToggleAll(): void
     {
         if (!$this->multiple || !$this->toggleEnable) {
             return;
@@ -218,7 +215,7 @@ class Select2 extends InputWidget
     /**
      * Register plugin events.
      */
-    protected function registerEvents()
+    protected function registerEvents(): void
     {
         $view = $this->getView();
         $selector = '#' . $this->options['id'];
@@ -257,7 +254,7 @@ class Select2 extends InputWidget
     /**
      * Init config set options
      */
-    protected function initOption()
+    protected function initOption(): void
     {
         if (!isset($this->options['id'])) {
             $this->options['id'] = $this->getId();
@@ -308,7 +305,7 @@ class Select2 extends InputWidget
      * @param $var
      * @return string
      */
-    protected function boolToStr($var)
+    protected function boolToStr($var): string
     {
         return $var === true ? 'true' : 'false';
     }
