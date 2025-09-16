@@ -14,7 +14,7 @@ class Select2Asset extends AssetBundle
     public $sourcePath = '@bower/select2/dist';
 
     public $css = [
-//        'css/select2' . (!YII_DEBUG ? ".min" : "") . ".css"
+        'css/select2' . (!YII_DEBUG ? ".min" : "") . ".css"
     ];
 
     public $js = [

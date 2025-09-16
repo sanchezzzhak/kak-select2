@@ -85,13 +85,14 @@ select[data-item-width="100"] ~ .select2 .select2-selection--multiple .select2-s
 }
 
 .select2-choice-direction-left.select2-selection--multiple .select2-selection__choice {
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
 }
 
 .select2-choice-direction-right.select2-selection--multiple .select2-selection__choice {
-  display: flex;
+  display: inline-flex;
   flex-direction: row-reverse;
+
   .select2-selection__choice__remove {
     margin-left: 3px;
   }

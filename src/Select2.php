@@ -18,7 +18,8 @@ class Select2 extends InputWidget
 {
     private const JS_KEY = 'kak/select2/';
 
-    public const THEME_DEFAULT = 'classic';
+    public const THEME_DEFAULT = 'default';
+    public const THEME_CLASSIC = 'classic';
     public const THEME_BOOTSTRAP = 'bootstrap';
 
     public const DIRECTION_LEFT = 'left';
@@ -89,7 +90,7 @@ class Select2 extends InputWidget
     public string $selectLabel = '';
     public string $unselectLabel = '';
 
-    public string $choiceDirection = self::DIRECTION_RIGHT;
+    public string $choiceDirection = self::DIRECTION_LEFT;
 
     public string $selectIcon = '<i class="glyphicon glyphicon-unchecked"></i>';
     public string $unSelectIcon = '<i class="glyphicon glyphicon-check"></i>';
@@ -321,8 +322,6 @@ class Select2 extends InputWidget
             $this->options['data-language'] = $this->language;
         }
 
-        $this->options['data-choice-direction'] = $this->choiceDirection;
-
         if (isset($this->ajax)) {
             $this->options['data-ajax--url'] = Url::to($this->ajax);
 
@@ -347,6 +346,7 @@ class Select2 extends InputWidget
         $this->options['data-counter-count'] = $this->counterCount;
         $this->options['data-max-show-items'] = $this->maxShowItems;
         $this->options['data-loading-delay'] = $this->loadingDelay;
+        $this->options['data-choice-direction'] = $this->choiceDirection;
     }
 
     /**
