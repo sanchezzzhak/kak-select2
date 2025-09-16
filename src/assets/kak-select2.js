@@ -154,19 +154,27 @@
 				selectCounter.hide();
 			}
 
-
 			if (!isShow) {
 				selectedFilters.show();
+				this.stagePlaceholder = false
 			} else {
 				selectedFilters.hide();
+				this.stagePlaceholder = true;
+			}
+
+			if (selectedFilters.length === 0) {
+				this.stagePlaceholder = true;
 			}
 
 			this.updatePlaceholder();
 		}
 
 		updatePlaceholder() {
-			const placeholder = this.getElement().data('placeholder');
-			this.getSelectSearch().attr('placeholder', placeholder);
+			const placeholder = this.options['placeholder'] ?? '';
+			if (this.stagePlaceholder) {
+				this.getSelectSearch().attr('placeholder',  placeholder);
+			}
+
 		}
 
 		initCounter() {
@@ -193,10 +201,17 @@
 						this.updateCounter();
 					}
 				});
+
+			$(window).on('resize', () => {
+				this.updateCounter();
+			})
+
 		}
 
 		initWidget() {
-			this.getElement().select2(this.options);
+			const el = this.getElement();
+			el.select2(this.options);
+			this.getSelectContainer().addClass('select2-choice-direction-' + el.data('choiceDirection'))
 		}
 
 		initScroll(e) {

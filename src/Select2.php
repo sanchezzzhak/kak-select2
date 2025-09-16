@@ -21,6 +21,9 @@ class Select2 extends InputWidget
     public const THEME_DEFAULT = 'classic';
     public const THEME_BOOTSTRAP = 'bootstrap';
 
+    public const DIRECTION_LEFT = 'left';
+    public const DIRECTION_RIGHT = 'right';
+
     //  Triggered whenever an option is selected or removed.
     public const EVENT_CHANGE = 'change';
     //  Triggered whenever the dropdown is closed.
@@ -86,10 +89,12 @@ class Select2 extends InputWidget
     public string $selectLabel = '';
     public string $unselectLabel = '';
 
+    public string $choiceDirection = self::DIRECTION_RIGHT;
+
     public string $selectIcon = '<i class="glyphicon glyphicon-unchecked"></i>';
     public string $unSelectIcon = '<i class="glyphicon glyphicon-check"></i>';
 
-    public bool $toggleEnable = true;
+    public bool $toggleEnable = false;
     public array $toggleOptions = [];
 
     public string $template = '{input}{toggle}';
@@ -161,7 +166,9 @@ class Select2 extends InputWidget
             ? Html::activeDropDownList($this->model, $this->attribute, $this->items, $this->options)
             : Html::dropDownList($this->name, $this->value, $this->items, $this->options);
 
-        return Html::tag('div', implode(PHP_EOL, $output), ['class' => 'kak-select2']);
+        $options = ['class' => 'kak-select2'];
+
+        return Html::tag('div', implode(PHP_EOL, $output), $options);
     }
 
 
@@ -233,6 +240,7 @@ class Select2 extends InputWidget
 
         Select2Asset::register($view);
         KakSelect2Asset::register($view);
+
         KakSelect2LanguageAsset::register($view)->addLanguage($this->language);
 
         if ((string)$this->theme === self::THEME_BOOTSTRAP) {
@@ -313,6 +321,8 @@ class Select2 extends InputWidget
             $this->options['data-language'] = $this->language;
         }
 
+        $this->options['data-choice-direction'] = $this->choiceDirection;
+
         if (isset($this->ajax)) {
             $this->options['data-ajax--url'] = Url::to($this->ajax);
 
@@ -320,8 +330,11 @@ class Select2 extends InputWidget
             $this->options['data-minimum-input-length'] = $this->minimumInputLength;
         }
 
-        if (isset($this->placeholder)) {
+        if ((string)$this->placeholder !== '') {
             $this->options['data-placeholder'] = $this->placeholder;
+            if (!isset($this->clientOptions['placeholder'])) {
+                $this->clientOptions['placeholder'] = $this->placeholder;
+            }
         }
 
         $this->clientOptions['theme'] = $this->theme;
