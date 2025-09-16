@@ -14,13 +14,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require --prefer-dist kak/select2 "dev-master"
+php composer.phar require --prefer-dist kak/select2 "*"
 ```
 
 or add
 
 ```
-"kak/select2": "dev-master"
+"kak/select2": "*"
 ```
 
 to the require section of your `composer.json` file.
@@ -111,7 +111,6 @@ Example:
 ```php
 'ajax' => ['site/search-countries'],
 'minimumInputLength' => 2,
-'ajaxCache' => false,
 ```
 
 ---
