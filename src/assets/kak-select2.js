@@ -46,9 +46,7 @@
 					return;
 				}
 				$.ajax({
-					url: $el.data('loadItemsUrl'),
-					dataType: 'json',
-					success: function (data) {
+					url: $el.data('loadItemsUrl'), dataType: 'json', success: function (data) {
 						this.options['data'] = data.results;
 						resolve('afterLoadData success');
 					}
@@ -127,24 +125,37 @@
 			const selectCounter = this.getSelectCounter()
 
 			const selectedFilters = this.getSelectChoices();
-			const availableWidth = parseInt(this.getSelectContainer().width())
-				- (selectCounter.length ? selectCounter.width() : 0) - parseInt(getComputedStyle(selectCounter.get(0)).right);
+			const availableWidth = parseInt(this.getSelectContainer().width()) -
+				selectCounter.width() - parseInt(getComputedStyle(selectCounter.get(0)).right);
 
-			const optionCount = this.getElement().find('option').length;
-			const counterMax = parserInt(el.data('counterCount') || 0)
+			let optionCount = this.getElement().find('option').length;
+			let counterMax = parseInt(el.data('counterCount') || 0)
+
+			counterMax = counterMax > 0 && counterMax !== optionCount ? counterMax : optionCount;
+
+			if (counterMax > 999) {
+				counterMax = '999+'
+			}
 
 			this.updateCounterSelect(selectedFilters.length)
-			this.updateCounterMax(counterMax > 0 && counterMax !== optionCount
-				? counterMax: optionCount)
+			this.updateCounterMax(counterMax)
 
 			let selectedFiltersWidth = 0;
 			selectedFilters.each(function () {
 				selectedFiltersWidth += $(this).outerWidth();
 			});
 			const maxShowItems = parseInt(el.data('maxShowItems'));
-			const isShow = selectedFiltersWidth < availableWidth &&
-				selectedFilters.length > 0 && selectedFilters.length <= maxShowItems && maxShowItems > 0;
-			if (isShow) {
+			const isShow = (selectedFiltersWidth > availableWidth)
+				|| (selectedFilters.length >= maxShowItems && maxShowItems > 0);
+
+			if (selectedFilters.length) {
+				selectCounter.show();
+			} else {
+				selectCounter.hide();
+			}
+
+
+			if (!isShow) {
 				selectedFilters.show();
 			} else {
 				selectedFilters.hide();
@@ -160,12 +171,17 @@
 
 		initCounter() {
 			const el = this.getElement();
+
+			if (!this.isMultiple()) {
+				return;
+			}
+
 			const container = this.getSelectContainer();
 			container.append($(el.data('counterTemplate')))
 			this.updateCounter();
 
 			this.getElement()
-				.on('select2:open change select2:change select2:close select2:open',  (e) => {
+				.on('select2:open change select2:change select2:close select2:open', (e) => {
 					if (e.type === 'select2:open') {
 						const searchField = this.getSelectSearch();
 						const selectedFilters = this.getSelectChoices();
@@ -200,21 +216,23 @@
 			return !!this.getElement().data('toggleEnable')
 		}
 
+		isAjax() {
+			return !!this.getElement().data('ajax--url')
+		}
+
 		isMultiple() {
 			return !!this.getElement().attr('multiple')
 		}
 
 		initS2ToggleAll() {
 			const $el = this.getElement();
-			const id = $el.attr('id'),
-				togId = '#' + 's2-togall-' + id,
-				$tog = $(togId);
+			const id = $el.attr('id'), togId = '#' + 's2-togall-' + id, $tog = $(togId);
 
-			if (!this.isMultiple()|| !this.isToggleEnable()) {
+			if (!this.isMultiple() || !this.isToggleEnable()) {
 				return;
 			}
 
-			const isAjax = !!$el.data('ajax--url');
+			const isAjax = this.isAjax();
 
 			$el.on('select2:open.kak-select2', function () {
 				$('#select2-' + id + '-results').closest('.select2-dropdown').prepend($tog);
