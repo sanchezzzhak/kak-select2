@@ -179,11 +179,12 @@
 
 		initCounter() {
 			const el = this.getElement();
-
-			if (!this.isMultiple()) {
+			if (!this.isMultiple() ) {
 				return;
 			}
-
+			if (!el.data('counterShow')) {
+				return;
+			}
 			const container = this.getSelectContainer();
 			container.append($(el.data('counterTemplate')))
 			this.updateCounter();

@@ -57,9 +57,8 @@ class Select2 extends InputWidget
 
     public string $loadIndicator = '<div class="select2-pre-loading"></div>';
     public int $loadingDelay = 500;
-    public bool $loadingShow = true;
-
-    public bool $counterShow = true;
+    public bool $loadingShow = false;
+    public bool $counterShow = false;
     public string $counterTemplate = '<span class="select2-counter"><span>0</span> of <span>0</span></span>';
     public int $counterCount = 0;
     public int $maxShowItems = 3;
@@ -95,7 +94,7 @@ class Select2 extends InputWidget
     public string $selectIcon = '<i class="glyphicon glyphicon-unchecked"></i>';
     public string $unSelectIcon = '<i class="glyphicon glyphicon-check"></i>';
 
-    public bool $toggleEnable = false;
+    public bool $toggleEnable = true;
     public array $toggleOptions = [];
 
     public string $template = '{input}{toggle}';
