@@ -19,17 +19,24 @@ class KakSelect2LanguageAsset extends AssetBundle
     /**
      * Add selected language
      *
-     * @param $lang
+     * @param string|null $lang
      * @return $this
      */
-    public function addLanguage($lang = null)
+    public function addLanguage(?string $lang = null)
     {
-        if ($lang === false) {
+        if ((string)$lang === '') {
             return $this;
         }
 
+        $fullpath = \Yii::getAlias($this->sourcePath . '/js/i18n/' . $lang . '.js');
+        if (is_file($fullpath)) {
+            $this->js[] = 'js/i18n/' . $lang . '.js';
+            return $this;
+        }
+
+        $lang = explode('-', $lang)[0] ?? $lang;
         $lang = !empty($lang) ? $lang : 'en';
-        $this->js[] = 'js/i18n/' . $lang . '.js';
+        $this->js[] = 'js/i18n/' . strtolower($lang) . '.js';
 
         return $this;
     }
