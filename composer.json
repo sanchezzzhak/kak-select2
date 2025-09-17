@@ -2,6 +2,10 @@
   "name": "kak/select2",
   "description": "select2 widgets for Yii2",
   "type": "library",
+  "support": {
+    "issues": "https://github.com/sanchezzzhak/kak-select2/issues?state=open",
+    "source": "https://github.com/sanchezzzhak/kak-select2"
+  },
   "keywords": [
     "yii2",
     "select2 yii2",
@@ -15,7 +19,6 @@
     }
   ],
   "require": {
-    "php": ">=7.4",
     "yiisoft/yii2": "*",
     "bower-asset/select2": "^4.0",
     "bower-asset/slimscroll": "*"
