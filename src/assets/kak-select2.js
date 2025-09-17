@@ -15,7 +15,7 @@
 	'use strict';
 
 	const selector = {
-		base: '.kak-select2',
+		base: '.wrap-select2',
 		items_selected_multiple: '.select2-selection--multiple .select2-selection__rendered',
 	};
 
@@ -249,7 +249,7 @@
 
 			const isAjax = this.isAjax();
 
-			$el.on('select2:open.kak-select2', function () {
+			$el.on('select2:open.wrap-select2', function () {
 				$('#select2-' + id + '-results').closest('.select2-dropdown').prepend($tog);
 				$('#parent-' + togId).remove();
 
@@ -260,7 +260,7 @@
 					$tog.addClass('s2-togall-select');
 				}
 
-			}).on('change.kak-select2', function () {
+			}).on('change', function () {
 				let tot = 0, sel = $el.val() ? $el.val().length : 0;
 				$tog.removeClass('s2-togall-select s2-togall-unselect');
 				$el.find('option:enabled').each(function () {
@@ -278,7 +278,7 @@
 			const EVENT_SELECTALL = 'selectall';
 			const EVENT_UNSELECTALL = 'unselectall';
 
-			$tog.off('.kak-select2').on('click.kak-select2', function () {
+			$tog.off('.wrap-select2').on('click.wrap-select2', function () {
 				const $search = $el.closest(selector.base).find('input.select2-search__field');
 				const $options = $('.select2-results__options li');
 				const isSelect = $tog.hasClass('s2-togall-select');
@@ -305,7 +305,7 @@
 							$opt.prop('selected', flag);
 						}
 					});
-					$el.select2('close').trigger('kak-select2:' + ev).trigger('change');
+					$el.select2('close').trigger('wrap-select2:' + ev).trigger('change');
 				}
 			});
 		}

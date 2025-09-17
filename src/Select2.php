@@ -55,7 +55,7 @@ class Select2 extends InputWidget
     /** @var string|array */
     public $loadItemsUrl;
 
-    public string $loadIndicator = '<div class="select2-pre-loading">loading </div>';
+    public string $loadIndicator = '<div class="select2-pre-loading"></div>';
     public int $loadingDelay = 500;
     public bool $loadingShow = true;
 
@@ -167,7 +167,7 @@ class Select2 extends InputWidget
             ? Html::activeDropDownList($this->model, $this->attribute, $this->items, $this->options)
             : Html::dropDownList($this->name, $this->value, $this->items, $this->options);
 
-        $options = ['class' => 'kak-select2'];
+        $options = ['class' => 'wrap-select2'];
 
         return Html::tag('div', implode(PHP_EOL, $output), $options);
     }

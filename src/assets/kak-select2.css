@@ -62,7 +62,7 @@ select[data-item-width="100"] ~ .select2 .select2-selection--multiple .select2-s
   overflow: hidden;
 }
 
-.kak-select2 {
+.wrap-select2 {
   position: relative;
 }
 
