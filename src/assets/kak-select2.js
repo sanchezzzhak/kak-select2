@@ -297,9 +297,15 @@
 					this.updateCounter();
 				});
 
-			select2.on('results:all', (resultData, params) => {
+			select2.on('results:all',  (resultData, params) => {
 				const totalCount = resultData.data ? resultData.data.total : 0;
-				this.getElement().attr('data-counter-count', totalCount);
+				const isUpdated = String(this.getElement().attr('data-counter-once')) !== '1';
+				if (String(this.getElement().attr('data-counter-once')) === '0') {
+					this.getElement().attr('data-counter-once', '1');
+				}
+				if (isUpdated) {
+					this.getElement().attr('data-counter-count', totalCount);
+				}
 			})
 
 			$(window).on('resize', () => {

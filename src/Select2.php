@@ -61,6 +61,7 @@ class Select2 extends InputWidget
     public bool $counterShow = false;
     public string $counterTemplate = '<span class="select2-counter"><span>0</span> of <span>0</span></span>';
     public int $counterCount = 0;
+    public bool $counterOnce = true;
     public int $maxShowItems = 3;
 
     /** @var string|array */
@@ -343,6 +344,11 @@ class Select2 extends InputWidget
         $this->options['data-counter-show'] = $this->boolToStr($this->counterShow);
         $this->options['data-counter-template'] = $this->counterTemplate;
         $this->options['data-counter-count'] = $this->counterCount;
+
+        if ($this->counterOnce) {
+            $this->options['data-counter-once'] = '0';
+        }
+
         $this->options['data-max-show-items'] = $this->maxShowItems;
         $this->options['data-loading-delay'] = $this->loadingDelay;
         $this->options['data-choice-direction'] = $this->choiceDirection;
