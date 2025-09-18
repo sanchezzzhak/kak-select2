@@ -99,4 +99,8 @@ select[data-item-width="100"] ~ .select2 .select2-selection--multiple .select2-s
   margin-left: 3px;
 }
 
+.select2-container .select2-selection--select2-counter .select2-selection__rendered {
+  max-height: 28px;
+}
+
 /*# sourceMappingURL=kak-select2.css.map */

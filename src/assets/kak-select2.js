@@ -170,32 +170,49 @@
 			this.getSelectCounter().find('span:eq(1)').text(value)
 		}
 
+		isMaxSelected() {
+			const el = this.getElement();
+			const maxShowItems = parseInt(el.data('maxShowItems'));
+			const optionCount = this.getElement().find('option:selected').length;
+			return optionCount > maxShowItems;
+		}
+
+		getAvailableWidth() {
+			const selectCounter = this.getSelectCounter();
+
+			return parseInt(this.getSelectContainer().width()) -
+				selectCounter.width() - parseInt(getComputedStyle(selectCounter.get(0)).right);
+		}
+
+		getSelectedFiltersWidth() {
+			const selectedFilters = this.getSelectChoices();
+			let selectedFiltersWidth = 0;
+			selectedFilters.each(function () {
+				selectedFiltersWidth += $(this).outerWidth(true);
+			});
+			return selectedFiltersWidth;
+		}
+
+		isAvailableSelectedFiltersShow() {
+			return (this.getSelectedFiltersWidth() > this.getAvailableWidth()) || this.isMaxSelected();
+		}
+
 		/**
 		 * update counter 0 of 0 values and resize select values
 		 */
 		updateCounter() {
 			const el = this.getElement();
+
 			const selectCounter = this.getSelectCounter()
-
 			const selectedFilters = this.getSelectChoices();
-			const availableWidth = parseInt(this.getSelectContainer().width()) -
-				selectCounter.width() - parseInt(getComputedStyle(selectCounter.get(0)).right);
-
-			let optionCount = this.getElement().find('option').length;
-			let counterMax = parseInt(el.attr('data-counter-count') || 0)
+			const optionCount = this.getElement().find('option').length;
+			let counterMax = el.attr('data-counter-count');
 			counterMax = counterMax > 0 && counterMax !== optionCount ? counterMax : optionCount;
 
-			this.updateCounterSelect(selectedFilters.length)
+			this.updateCounterSelect(this.getElement().find('option:selected').length)
 			this.updateCounterMax(counterMax)
 
-			let selectedFiltersWidth = this.getSelectContainer().find('.select2-search--inline').outerWidth();
-			selectedFilters.each(function () {
-				selectedFiltersWidth += $(this).outerWidth();
-			});
-
-			const maxShowItems = parseInt(el.data('maxShowItems'));
-			const isShow = (selectedFiltersWidth > availableWidth)
-				|| (selectedFilters.length >= maxShowItems && maxShowItems > 0);
+			const isShow = this.isAvailableSelectedFiltersShow();
 
 			if (selectedFilters.length) {
 				selectCounter.show();
@@ -224,7 +241,7 @@
 		updatePlaceholder() {
 			const placeholder = this.options['placeholder'] ?? '';
 			if (this.stagePlaceholder) {
-				this.getSelectSearch().attr('placeholder',  placeholder);
+				this.getSelectSearch().attr('placeholder', placeholder);
 			}
 		}
 
@@ -241,7 +258,7 @@
 		 */
 		initCounter() {
 			const el = this.getElement();
-			if (!this.isMultiple() ) {
+			if (!this.isMultiple()) {
 				return;
 			}
 			if (this.isCounter()) {
@@ -250,12 +267,14 @@
 
 			const select2 = this.getSelect2();
 			const container = this.getSelectContainer();
+
+			container.addClass('select2-selection--select2-counter')
 			container.append($(el.data('counterTemplate')))
 
 			this.updateCounter();
 
 			this.getElement()
-				.on('select2:open change select2:change select2:close select2:open', (e) => {
+				.on('select2:open change select2:close', (e) => {
 					if (e.type === 'select2:open') {
 						const searchField = this.getSelectSearch();
 						const selectedFilters = this.getSelectChoices();
@@ -263,22 +282,29 @@
 						searchField.show();
 						this.updatePlaceholder();
 						searchField.focus();
-					} else {
-						this.updateCounter();
+						return;
 					}
+					if (e.type === 'select2:close') {
+						setTimeout(() => {
+							$(':focus').blur();
+							$('.select2-container-active').removeClass('select2-container-active');
+							this.updateCounter();
+						}, 1);
+						e.stopPropagation()
+						return;
+					}
+
+					this.updateCounter();
 				});
 
-
 			select2.on('results:all', (resultData, params) => {
-				const totalCount = resultData.data ? resultData.data.total: 0;
-				this.getElement().attr('data-counter-count', totalCount)
-				// this.getElement().trigger('results:all.wrap-select2', resultData, params);
+				const totalCount = resultData.data ? resultData.data.total : 0;
+				this.getElement().attr('data-counter-count', totalCount);
 			})
 
 			$(window).on('resize', () => {
 				this.updateCounter();
 			})
-
 		}
 
 		/**
@@ -288,6 +314,18 @@
 			const el = this.getElement();
 			el.select2(this.options);
 			this.getSelectContainer().addClass('select2-choice-direction-' + el.data('choiceDirection'))
+
+			if (this.isAjax()) {
+				el.on('select2:unselect', e => {
+					e.stopPropagation();
+					const {id, text, selected} = e.params.data;
+					const target = $(e.params.originalEvent.target);
+					const option = el.find('option[value="' + id + '"]');
+					this.isMultiple() ? option.remove() : option.prop('selected', selected);
+					el.trigger('change');
+					target.removeClass('select2-results__option--highlighted')
+				})
+			}
 		}
 
 		/**
