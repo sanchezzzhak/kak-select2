@@ -305,6 +305,418 @@ echo Select2::widget([
 
 ---
 
+### Best practice for results ajax data
+
+* 1 create common helper for result data
+
+```php
+<?php
+
+namespace app\helpers;
+
+use yii\db\ActiveQuery;
+use yii\db\QueryInterface;
+use yii\helpers\Html;
+use yii\helpers\StringHelper;
+
+final class Select2Helper
+{
+    private const RESULT_LIMIT = 150;   // portion size for output
+    public const FORMAT_ID = 'id';      // displays as id => text
+    public const FORMAT_RAW = 'raw';    // displays as is 
+    public const FORMAT_SEP = 'sep';    // displays as  id => id | text
+
+    /**
+     * select2 settings for the clientOptions by default
+     * @return true[]
+     */
+    public static function getClientOptions(): array
+    {
+        return [
+            'allowClear' => true
+        ];
+    }
+
+    /**
+     * select2 settings for the options by default
+     * @return int[]
+     */
+    public static function getOptions(): array
+    {
+        return [
+            'data-scroll-height' => 150,
+            'data-item-width' => 100,
+        ];
+    }
+
+    /**
+     * make ActiveQuery
+     * @param string $className - class for search
+     * @param string $attribute - search by the attribute
+     * @param int|float|string|array|null $q - value by search
+     * @param string $formatId - result format see const above class
+     * @return QueryInterface
+     */
+    public static function makeQueryFind(
+        string $className,
+        string $attribute,
+        int|float|string|array|null $q = null,
+        string $formatId = self::FORMAT_SEP
+    ): QueryInterface {
+
+        $alias = strtolower(StringHelper::basename($className));
+        $query = self::getQueryByClassName($className);
+        $query->alias($alias);
+        $query->asArray();
+
+        $idAttribute = sprintf('%s.id', $alias);
+        $attribute = sprintf('%s.%s', $alias, $attribute);
+
+        match ($formatId) {
+            self::FORMAT_SEP =>
+            $query->select([
+                $idAttribute,
+                sprintf("CONCAT(%s, ' | ', %s) as text", $attribute, $idAttribute)
+            ]),
+            self::FORMAT_ID =>
+            $query->select([
+                $idAttribute,
+                sprintf('CONCAT(%s, " [", %s,"]") AS text', $attribute, $idAttribute)
+            ]),
+            default =>
+            $query->select([$idAttribute, $attribute . ' as text']),
+        };
+
+
+
+        if (is_string($q) && $q !== '') {
+            $query->orFilterWhere(['LIKE', $attribute, $q]);
+        }
+        if (is_numeric($q) && (int)$q > 0) {
+            $query->orWhere("$idAttribute=:id", [':id' => $q]);
+        }
+        if (is_iterable($q) && $q !== []) {
+            $query->orWhere([$idAttribute => $q]);
+        }
+        return $query;
+    }
+
+
+    /**
+     * get ActiveQuery by class name
+     * @param string $className
+     * @return ActiveQuery
+     */
+    private static function getQueryByClassName(string $className): ActiveQuery
+    {
+        return call_user_func([$className, 'find']);
+    }
+
+    /**
+     * common result for ajax query for Select2 widget
+     * @param QueryInterface $query
+     * @param int $page
+     * @param string $formatId
+     * @return array
+     */
+    public static function asQueryToResults(
+        QueryInterface $query,
+        int $page = 1,
+        string $formatId = self::FORMAT_SEP
+    ): array {
+
+        $queryTotal = clone $query;
+        $total = $queryTotal->count();
+
+        $offset = ($page - 1) * self::RESULT_LIMIT;
+        $results = $query->offset($offset)->limit(self::RESULT_LIMIT)->asArray()->all();
+        foreach ($results as $key => $data) {
+            $results[$key]['text'] = match ($formatId) {
+                self::FORMAT_ID => sprintf('[%s] %s', $data['id'], $data['text']),
+                self::FORMAT_SEP => sprintf('%s | %s', $data['id'], $data['text']),
+                default => sprintf('%s', $data['text']),
+            };
+        }
+
+        return [
+            'results' => $results,
+            'total' => $total,
+            'pagination' => [
+                'more' => count($results) > 0
+            ],
+        ];
+    }
+
+    /**
+     * common result for selected values for Select2 widget
+     * @param QueryInterface $query
+     * @param string $formatId
+     * @return array
+     */
+    public static function asQueryToSelectedResult(QueryInterface $query, string $formatId = self::FORMAT_SEP): array
+    {
+        $items = $query->asArray()->all();
+        $results = [];
+        foreach ($items as $data) {
+            $text = Html::encode($data['text']);
+
+            $results[$data['id']] = match ($formatId) {
+                self::FORMAT_ID => sprintf('[%s] %s', $data['id'], $text),
+                self::FORMAT_SEP => sprintf('%s | %s', $data['id'], $text),
+                default => $text,
+            };
+        }
+
+        return $results;
+    }
+}
+
+```
+
+* 2 create DataSelectService
+```php
+<?php
+
+namespace app\services;
+
+use app\helpers\Select2Helper;
+
+class DataSelectService extends BaseObject
+{
+    private const FORMAT_SEP = Select2Helper::FORMAT_SEP;
+    private const FORMAT_RAW = Select2Helper::FORMAT_RAW;
+    
+    public int $page = 1;
+     
+    private function asResultsByQuery(QueryInterface $query, string $format): array
+    {
+        return Select2Helper::asQueryToResults($query, $this->page, $format);
+    }
+
+    private function asResultByList(QueryInterface $query, string $format): array
+    {
+        return Select2Helper::asQueryToSelectedResult($query, $format);
+    }
+    
+    /** =============================== */
+    
+    private function getCountryQuery(): QueryInterface
+    {
+        return Country::find()->select([
+            "id",
+            'text' => new Expression(
+                implode(PHP_EOL, [
+                    'CASE', 'WHEN',
+                    "name_ru IS NOT NULL AND name_ru != '' THEN name_ru",
+                    'ELSE',
+                    'name_en',
+                    'END'
+                ])
+            )
+        ]);
+    }
+    
+    /**
+      * result for ajax query
+      * @param string|null $q
+      * @return array
+     */
+    public function searchCountry(?string $q): array
+    {
+        $query = $this->getCountryQuery();
+        $query->andFilterWhere(['OR', ['like', 'name_ru', $q], ['like', 'name_en', $q], ['like', 'id', $q]]);
+        return $this->asResultsByQuery($query, self::FORMAT_RAW);
+    }
+    
+    /**
+     * result for selected values in filter form
+     * @param array $list
+     * @return array
+     */
+    public function getCountryByList(array $list): array
+    {
+        $query = $this->getCountryQuery();
+        $query->andWhere(['id' => $list]);
+        return $list !== [] ? $this->asResultByList($query, self::FORMAT_RAW) : [];
+    }
+    
+    // ...
+}
+```
+
+* 3 create ajax controller apply up code
+```php
+<?php
+
+namespace app\controllers;
+
+class AjaxController extends Controller
+{
+     public ?DataSelectService $dataSelect = null;
+
+    public function init()
+    {
+        parent::init();
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $lang = strtolower(Yii::$app->language);
+        $language = match(true) {
+           str_contains($lang, 'en') => 'en',
+           default => 'ru'
+        };
+        // init service
+        $this->dataSelect = new DataSelectService([
+            'language' => $language,
+            'page' => (int)$this->request->get('page', 1),
+        ]);
+    }
+
+
+    /**
+     * optional only auth users
+     * @return array
+     */
+    public function behaviors(): array
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
+    
+     /**
+     * Country list for select2 widget
+     * @param string|null $q
+     * @return array
+     */
+    public function actionLoadCountry(?string $q = null): array
+    {
+        return $this->dataSelect->searchCountry($q);
+    }
+}
+```
+* 4 create filter trait base
+```php
+<?php
+
+namespace app\models\filters;
+   
+   
+trait BaseFilterTrait
+{
+    /**
+     * @throws UnknownPropertyException
+     */
+    private function findAttributeName(array $list): ?string
+    {
+        $attribute = null;
+        foreach ($list as $name) {
+            if ($this->hasProperty($name)) {
+                $attribute = $name;
+                break;
+            }
+        }
+        if ($attribute === null) {
+            throw new UnknownPropertyException(
+                sprintf('The class does not realize the property from the list [%s]', implode(', ', $list))
+            );
+        }
+        return $attribute;
+    }
+
+    private function getFilterValueByAttribute(string $attribute): array
+    {
+        $value = $this->{$attribute};
+        return is_iterable($value) ? $value : [$value];
+    }
+}
+```
+
+* 5 create trait filter for search form
+```php
+<?php
+
+namespace app\models\filters;
+
+use app\services\DataSelectService;
+use yii\base\UnknownPropertyException;
+
+trait CountryFromFilterTrait
+{
+    use BaseFilterTrait;
+
+    /**
+     * @throws UnknownPropertyException
+     */
+    public function getCountryFromFilter(): array
+    {
+        static $countries;
+        $attribute = $this->findAttributeName(['countryId', 'country_id', 'country']);
+        if ($countries === null) {
+            $dataSelect = new DataSelectService();
+            $cities = $dataSelect->getCountryByList($this->getFilterValueByAttribute($attribute));
+        }
+        return $cities ?? [];
+    }
+}
+
+```
+
+* 6 bind filter for search form
+```php
+class UserRegistration extends Model
+  {
+       use CountryFromFilterTrait;
+       public $countryId;  
+  }
+}
+```
+
+* 7 render view
+
+```php
+
+<?php
+/*
+$selectConfig = [
+    'theme' => Select2::THEME_DEFAULT,
+    'multiple' => true,
+    'loadingShow' => true,
+    'loadingDelay' => 300,
+    'counterShow' => true,
+    'counterTemplate' => sprintf(
+        '<span class="select2-counter"><span>0</span> %s <span>0</span></span>',
+        Yii::t('app', 'of')
+    ),
+    'choiceDirection' => Select2::DIRECTION_RIGHT,
+    'options' => [
+        'class' => $selectClass,  // add custom css class
+    ],
+    'toggleEnable' => false,     // 
+    'clientOptions' => [
+        'allowClear' => true,
+    ],
+]
+*/
+?>
+ <?= $form->field($model, 'country_id')->widget(Select2::class, [
+    'placeholder' => $countryFilterPlaceholder, // custom set placeholder
+    'items' => $model->getCountryFromFilter(),  // UserRegistration model
+    'ajax' => ['ajax/load-country'],            // set ajax url
+    ...$selectConfig
+]) ?>
+
+
+
+```
+
 ### 📄 License
 
 MIT

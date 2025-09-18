@@ -38,6 +38,22 @@
 		destroy() {
 		}
 
+		isToggleEnable() {
+			return !!this.getElement().data('toggleEnable')
+		}
+
+		isAjax() {
+			return !!this.getElement().data('ajax--url')
+		}
+
+		isMultiple() {
+			return !!this.getElement().attr('multiple')
+		}
+
+		isCounter() {
+			return !!!this.getElement().data('counterShow')
+		}
+
 		afterLoadData() {
 			const $el = this.getElement();
 			return new Promise((resolve, reject) => {
@@ -64,10 +80,6 @@
 			this.hideLoading()
 		}
 
-		getPreLoading() {
-			return this.getElement().parent().find('.select2-pre-loading')
-		}
-
 		showLoading() {
 			let loading = this.getPreLoading();
 			let container = this.getElement().parent();
@@ -90,36 +102,77 @@
 
 		}
 
+		/**
+		 * get preloading element
+		 * @return {jQuery|HTMLElement|*}
+		 */
+		getPreLoading() {
+			return this.getElement().closest(selector.base).find('.select2-pre-loading')
+		}
+
+		/**
+		 * get select container block
+		 * @return {jQuery|HTMLElement|*}
+		 */
 		getSelectContainer() {
 			return this.getElement().closest(selector.base)
 				.find('.select2-container .select2-selection');
 		}
 
+		/**
+		 * get current Element
+		 * @return {jQuery|HTMLElement|*}
+		 */
 		getElement() {
 			return $(this.element)
 		}
 
+		/**
+		 * get input search
+		 * @return {jQuery|HTMLElement|*}
+		 */
 		getSelectSearch() {
 			return this.getSelectContainer().find('.select2-search__field');
 		}
 
+		/**
+		 * get html counter block
+		 * @return {jQuery|HTMLElement|*}
+		 */
 		getSelectCounter() {
 			return this.getSelectContainer().find('.select2-counter');
 		}
 
+		/**
+		 * get html Elemtnts for selects
+		 * @return {jQuery|HTMLElement|*}
+		 */
 		getSelectChoices() {
 			return this.getSelectContainer().find('.select2-selection__choice');
 		}
 
+		/**
+		 * update counter current values
+		 * @param value
+		 */
 		updateCounterSelect(value) {
 			this.getSelectCounter().find('span:eq(0)').text(value)
 		}
 
-
+		/**
+		 * update counter max count values
+		 * @param value
+		 */
 		updateCounterMax(value) {
+			if (value > 999) {
+				value = '999+'
+			}
 			this.getSelectCounter().find('span:eq(1)').text(value)
 		}
 
+		/**
+		 * update counter 0 of 0 values and resize select values
+		 */
 		updateCounter() {
 			const el = this.getElement();
 			const selectCounter = this.getSelectCounter()
@@ -129,21 +182,17 @@
 				selectCounter.width() - parseInt(getComputedStyle(selectCounter.get(0)).right);
 
 			let optionCount = this.getElement().find('option').length;
-			let counterMax = parseInt(el.data('counterCount') || 0)
-
+			let counterMax = parseInt(el.attr('data-counter-count') || 0)
 			counterMax = counterMax > 0 && counterMax !== optionCount ? counterMax : optionCount;
-
-			if (counterMax > 999) {
-				counterMax = '999+'
-			}
 
 			this.updateCounterSelect(selectedFilters.length)
 			this.updateCounterMax(counterMax)
 
-			let selectedFiltersWidth = 0;
+			let selectedFiltersWidth = this.getSelectContainer().find('.select2-search--inline').outerWidth();
 			selectedFilters.each(function () {
 				selectedFiltersWidth += $(this).outerWidth();
 			});
+
 			const maxShowItems = parseInt(el.data('maxShowItems'));
 			const isShow = (selectedFiltersWidth > availableWidth)
 				|| (selectedFilters.length >= maxShowItems && maxShowItems > 0);
@@ -169,24 +218,40 @@
 			this.updatePlaceholder();
 		}
 
+		/**
+		 * update search placeholder in select2
+		 */
 		updatePlaceholder() {
 			const placeholder = this.options['placeholder'] ?? '';
 			if (this.stagePlaceholder) {
 				this.getSelectSearch().attr('placeholder',  placeholder);
 			}
-
 		}
 
+		/**
+		 * get select instance select2
+		 * @return {*}
+		 */
+		getSelect2() {
+			return this.getElement().data('select2');
+		}
+
+		/**
+		 * init counter block
+		 */
 		initCounter() {
 			const el = this.getElement();
 			if (!this.isMultiple() ) {
 				return;
 			}
-			if (!el.data('counterShow')) {
+			if (this.isCounter()) {
 				return;
 			}
+
+			const select2 = this.getSelect2();
 			const container = this.getSelectContainer();
 			container.append($(el.data('counterTemplate')))
+
 			this.updateCounter();
 
 			this.getElement()
@@ -203,19 +268,32 @@
 					}
 				});
 
+
+			select2.on('results:all', (resultData, params) => {
+				const totalCount = resultData.data ? resultData.data.total: 0;
+				this.getElement().attr('data-counter-count', totalCount)
+				// this.getElement().trigger('results:all.wrap-select2', resultData, params);
+			})
+
 			$(window).on('resize', () => {
 				this.updateCounter();
 			})
 
 		}
 
+		/**
+		 * init select2 widget base
+		 */
 		initWidget() {
 			const el = this.getElement();
 			el.select2(this.options);
 			this.getSelectContainer().addClass('select2-choice-direction-' + el.data('choiceDirection'))
 		}
 
-		initScroll(e) {
+		/**
+		 * inti slimScroll in selection container
+		 */
+		initScroll() {
 			const scroll = this.getElement().data('scrollHeight');
 			if (!scroll) {
 				return;
@@ -226,18 +304,6 @@
 				.slimScroll({height: ''})
 				.css('max-height', scroll + 'px');
 
-		}
-
-		isToggleEnable() {
-			return !!this.getElement().data('toggleEnable')
-		}
-
-		isAjax() {
-			return !!this.getElement().data('ajax--url')
-		}
-
-		isMultiple() {
-			return !!this.getElement().attr('multiple')
 		}
 
 		initS2ToggleAll() {
@@ -260,7 +326,6 @@
 				} else {
 					$tog.addClass('s2-togall-select');
 				}
-
 			}).on('change', function () {
 				let tot = 0, sel = $el.val() ? $el.val().length : 0;
 				$tog.removeClass('s2-togall-select s2-togall-unselect');
