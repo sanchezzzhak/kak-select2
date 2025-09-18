@@ -323,9 +323,11 @@
 
 			if (this.isAjax()) {
 				el.on('select2:unselect', e => {
-					e.stopPropagation();
-					const {id, text, selected} = e.params.data;
 					const target = $(e.params.originalEvent.target);
+					if (!target.hasClass('select2-results__option')) {
+						return;
+					}
+					const {id, text, selected} = e.params.data;
 					const option = el.find('option[value="' + id + '"]');
 					this.isMultiple() ? option.remove() : option.prop('selected', selected);
 					el.trigger('change');
