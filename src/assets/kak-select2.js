@@ -73,7 +73,7 @@
 		async initS2() {
 			this.showLoading()
 			await this.afterLoadData();
-			this.initWidget();
+			await this.initWidget();
 			this.initScroll();
 			this.initCounter();
 			this.initS2ToggleAll();
@@ -97,6 +97,7 @@
 				if (loading) {
 					container.removeClass('pre-loading');
 					loading.remove();
+					el.trigger('update-counter')
 				}
 			}, el.data('loadingDelay') || 500)
 
@@ -133,6 +134,14 @@
 		 */
 		getSelectSearch() {
 			return this.getSelectContainer().find('.select2-search__field');
+		}
+
+		/**
+		 * get html render block
+		 * @return {jQuery|HTMLElement|*}
+		 */
+		getSelectRender() {
+			return this.getSelectContainer().find('.select2-selection__rendered');
 		}
 
 		/**
@@ -180,8 +189,8 @@
 		getAvailableWidth() {
 			const selectCounter = this.getSelectCounter();
 
-			return parseInt(this.getSelectContainer().width()) -
-				selectCounter.width() - parseInt(getComputedStyle(selectCounter.get(0)).right);
+			return parseInt(this.getSelectContainer().outerWidth()) -
+				selectCounter.outerWidth(true) - parseInt(getComputedStyle(selectCounter.get(0)).right);
 		}
 
 		getSelectedFiltersWidth() {
@@ -193,16 +202,16 @@
 			return selectedFiltersWidth;
 		}
 
-		isAvailableSelectedFiltersShow() {
-			return (this.getSelectedFiltersWidth() > this.getAvailableWidth()) || this.isMaxSelected();
-		}
-
 		/**
-		 * update counter 0 of 0 values and resize select values
+		 * update counter and UI
 		 */
-		updateCounter() {
+		updateCounter(event) {
 			const el = this.getElement();
 
+			const placeholder = this.options['placeholder'] ?? ''
+
+			const container = el.closest(selector.base).find('.select2-container');
+			const searchField = this.getSelectSearch();
 			const selectCounter = this.getSelectCounter()
 			const selectedFilters = this.getSelectChoices();
 			const optionCount = this.getElement().find('option').length;
@@ -212,36 +221,44 @@
 			this.updateCounterSelect(this.getElement().find('option:selected').length)
 			this.updateCounterMax(counterMax)
 
-			const isShow = this.isAvailableSelectedFiltersShow();
-
 			if (selectedFilters.length) {
 				selectCounter.show();
 			} else {
 				selectCounter.hide();
 			}
 
-			if (!isShow) {
-				selectedFilters.show();
-				this.stagePlaceholder = false
-			} else {
+			const isOpen = container.hasClass('select2-container--open');
+			const isChange = event === 'change';
+			const isClose = event === 'select2:close';
+
+			const availableWidth = this.getAvailableWidth();
+			const selectedFiltersWidth = this.getSelectedFiltersWidth();
+
+			const isHide = availableWidth < selectedFiltersWidth
+				|| this.isMaxSelected()
+				|| selectedFilters.length === 0;
+
+
+			if (event === 'select2:open') {
 				selectedFilters.hide();
-				this.stagePlaceholder = true;
+				searchField.show();
+				searchField.attr('placeholder', placeholder);
+				requestAnimationFrame(() => {
+					searchField.blur().focus();
+				})
+				return;
 			}
 
-			if (selectedFilters.length === 0) {
-				this.stagePlaceholder = true;
-			}
-
-			this.updatePlaceholder();
-		}
-
-		/**
-		 * update search placeholder in select2
-		 */
-		updatePlaceholder() {
-			const placeholder = this.options['placeholder'] ?? '';
-			if (this.stagePlaceholder) {
-				this.getSelectSearch().attr('placeholder', placeholder);
+			if (isHide) {
+				selectedFilters.hide()
+				searchField.show();
+				searchField.attr('placeholder', placeholder);
+			} else {
+				selectedFilters.show();
+				if (isClose && selectedFilters.length > 0 && !isOpen) {
+					searchField.attr('placeholder', placeholder);
+					searchField.hide();
+				}
 			}
 		}
 
@@ -257,7 +274,6 @@
 		 * init counter block
 		 */
 		initCounter() {
-			const el = this.getElement();
 			if (!this.isMultiple()) {
 				return;
 			}
@@ -265,74 +281,58 @@
 				return;
 			}
 
+			const el = this.getElement();
 			const select2 = this.getSelect2();
 			const container = this.getSelectContainer();
 
 			container.addClass('select2-selection--select2-counter')
 			container.append($(el.data('counterTemplate')))
 
-			this.updateCounter();
+			el.on('change select2:open select2:close update-counter', (e) => {
+				requestAnimationFrame(() => {
+					this.updateCounter(e.type);
+				})
+			});
 
-			this.getElement()
-				.on('select2:open change select2:close', (e) => {
-					if (e.type === 'select2:open') {
-						const searchField = this.getSelectSearch();
-						const selectedFilters = this.getSelectChoices();
-						selectedFilters.hide();
-						searchField.show();
-						this.updatePlaceholder();
-						searchField.focus();
-						return;
-					}
-					if (e.type === 'select2:close') {
-						setTimeout(() => {
-							$(':focus').blur();
-							$('.select2-container-active').removeClass('select2-container-active');
-							this.updateCounter();
-						}, 1);
-						e.stopPropagation()
-						return;
-					}
-
-					this.updateCounter();
-				});
+			// select2.on('blur', () => {
+			// 	this.updateCounter('blur');
+			// });
 
 			select2.on('results:all',  (resultData, params) => {
 				const totalCount = resultData.data ? resultData.data.total : 0;
-				const isUpdated = String(this.getElement().attr('data-counter-once')) !== '1';
-				if (String(this.getElement().attr('data-counter-once')) === '0') {
-					this.getElement().attr('data-counter-once', '1');
+				const isUpdated = String(el.attr('data-counter-once')) !== '1';
+				if (String(el.attr('data-counter-once')) === '0') {
+					el.attr('data-counter-once', '1');
 				}
 				if (isUpdated) {
-					this.getElement().attr('data-counter-count', totalCount);
+					el.attr('data-counter-count', totalCount);
 				}
 			})
 
 			$(window).on('resize', () => {
-				this.updateCounter();
+				this.updateCounter('resize');
 			})
 		}
 
 		/**
 		 * init select2 widget base
 		 */
-		initWidget() {
+		async initWidget() {
 			const el = this.getElement();
 			el.select2(this.options);
+
 			this.getSelectContainer().addClass('select2-choice-direction-' + el.data('choiceDirection'))
 
 			if (this.isAjax()) {
 				el.on('select2:unselect', e => {
-					const target = $(e.params.originalEvent.target);
-					if (!target.hasClass('select2-results__option')) {
-						return true;
+					if (e.params.originalEvent) {
+						const target = $(e.params.originalEvent.target);
+						const {id, text, selected} = e.params.data;
+						const option = el.find('option[value="' + id + '"]');
+						this.isMultiple() ? option.remove() : option.prop('selected', selected);
+						el.trigger('change');
+						target.removeClass('select2-results__option--highlighted')
 					}
-					e.stopPropagation();
-					const {id, text, selected} = e.params.data;
-					const option = el.find('option[value="' + id + '"]');
-					this.isMultiple() ? option.remove() : option.prop('selected', selected);
-					el.trigger('change');
-					target.removeClass('select2-results__option--highlighted')
 				})
 			}
 		}
